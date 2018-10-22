@@ -7,7 +7,7 @@ select
 	,CAST('' as date) as 'Fecha_nacimiento'
 	,'' as 'Folio' 
 	,01 as "Interaccion"
-	,'' as 'Canal'
+	,1 as 'Canal'
 	, CONVERT(VARCHAR(10),FecAcc,105) as Fecha
 	, CAST(DescripcionYHecho as varchar(2000)) as Descripcion
 	, Estado as "Estado"
@@ -27,7 +27,7 @@ select
 	,cast(SolFechaNac as date) as 'Fecha_nacimiento'
 	,'' as 'Folio'
 	,01 as "Interaccion"
-	,'' as 'Canal'
+	,1 as 'Canal'
 	, CONVERT(VARCHAR(10),FechaRegistro,105) as Fecha
 	, CAST(declaracionDenunciante as varchar(2000)) as Descripcion
 	, '' as "Estado"
@@ -47,7 +47,7 @@ SELECT
 	,CAST('' as date) as 'Fecha_nacimiento'
 	,'' as 'Folio' 
 	, 02 as "Interaccion"
-	,'' as 'Canal'
+	,4 as 'Canal'
 	,CASE WHEN PeriodoMes BETWEEN 0 AND 10 THEN RIGHT('0' + CAST(PeriodoMes AS VARCHAR(2)), 2)ELSE CAST(PeriodoMes AS VARCHAR(10))END+'-'+cast(PeriodoAgno as varchar(10)) as Fecha
 	,'Certificado Nomina Trabajador' as Descripcion 
 	, '' as "Estado"
@@ -66,7 +66,7 @@ SELECT
 	,CAST('' as date) as 'Fecha_nacimiento'
 	,'' as 'Folio' 
 	, 02 as "Interaccion"
-	,'' as 'Canal'
+	,4 as 'Canal'
 	, cast(RIGHT(periodoMesAno,2)+'-'+SUBSTRING(periodoMesAno,1,4) as varchar(10)) as Fecha
 	, 'Dato Previsional' as Descripcion 
 	, '' as "Estado"
@@ -88,7 +88,7 @@ Select
 	,CAST('' as date) as 'Fecha_nacimiento'
 	,'' as 'Folio' 
 	, 02 as "Interaccion"
-	,'' as 'Canal'
+	,4 as 'Canal'
 	, cast((CASE WHEN MesDespido BETWEEN 0 AND 10 THEN RIGHT('0' + CAST(MesDespido AS VARCHAR(2)), 2)ELSE CAST(MesDespido AS VARCHAR(10))END)+'-'+cast(AnoDespido as varchar(10)) as varchar(10)) as Fecha
 	, cast('Detalle Despido' as varchar(2000)) as Descripcion 
 	, '' as "Estado" 
@@ -109,7 +109,7 @@ select
 	,CAST('' as date) as 'Fecha_nacimiento'
 	,'' as 'Folio' 
 	, 02 as "Interaccion"
-	,'' as 'Canal'
+	,4 as 'Canal'
 	, '' as Fecha
 	, cast(DetalleMensajeCuadratura as varchar(2000)) as Descripcion 
 	, '' as "Estado" 
@@ -126,7 +126,7 @@ select
 	,CAST('' as date) as 'Fecha_nacimiento'
 	,'' as 'Folio' 
 	, 02 as "Interaccion"
-	,'' as 'Canal'
+	,4 as 'Canal'
 	,CONVERT(VARCHAR(10),FechaInicio,105) as Fecha
 	, CAST('Certificado Nomina Trabajador' as varchar(2000)) as Descripcion 
 	, '' as "Estado"
@@ -145,7 +145,7 @@ SELECT
 	,CAST('' as date) as 'Fecha_nacimiento'
 	,'' as 'Folio' 
 	, 03 as "Interaccion"
-	,'' as 'Canal'
+	,4 as 'Canal'
 	, '' as Fecha
 	, 'Trabajo Asesor' as Descripcion 
 	, '' as "Estado"
@@ -167,7 +167,7 @@ SELECT
 	, CAST('' as date) as 'Fecha_nacimiento'
 	, '' as 'Folio' 
 	, 03 as "Interaccion"
-	, '' as 'Canal'
+	, 1 as 'Canal'
 	, '' as Fecha
 	, CAST('Otro Afectado' as varchar(2000)) as Descripcion 
 	, '' as "Estado" 
@@ -189,7 +189,7 @@ select
 	, CAST(FechaNac as date) as 'Fecha_nacimiento'
 	, '' as 'Folio' 
 	, 03 as "Interaccion"
-	, '' as 'Canal'
+	, 1 as 'Canal'
 	, CONVERT(VARCHAR(10),FecInicioRL,105) as Fecha
 	, CAST('Reclamos Reclamante' as varchar(2000)) as Descripcion 
 	, '' as "Estado"
@@ -210,7 +210,7 @@ select
 	, CAST(FECHA_NACIMIENTO as date) as 'Fecha_nacimiento'
 	, '' as 'Folio' 
 	, 03 as "Interaccion"
-	, '' as 'Canal'
+	, 1 as 'Canal'
 	,cast('' as varchar(10)) as Fecha
 	,'Datos Asistentes Trabajador' as Descripcion 
 	, '' as "Estado"
@@ -231,7 +231,7 @@ select
 	, CAST('' as date) as 'Fecha_nacimiento'
 	, '' as 'Folio' 
 	, 04 as "Interaccion"
-	, '' as 'Canal'
+	, 4 as 'Canal'
 	, CONVERT(VARCHAR(10),fechaIngreso,105) as Fecha
 	, cast(DescripcionHecho as varchar(2000)) as Descripcion 
 	, cast(EstadoCotizaciones as varchar(200)) as Estado
@@ -254,7 +254,7 @@ select
 	, CAST('' as date) as 'Fecha_nacimiento'
 	, '' as 'Folio' 
 	, 04 as "Interaccion"
-	, '' as 'Canal'
+	, 4 as 'Canal'
 	, CONVERT(VARCHAR(10),FechaReg,105) as Fecha
 	, CAST(HechosCausal as varchar(2000)) as Descripcion 
 	, cast(EstadoCotizaciones as varchar(200)) as Estado
@@ -275,7 +275,7 @@ select
 	, CAST('' as date) as 'Fecha_nacimiento'
 	, '' as 'Folio' 
 	, 05 as "Interaccion"
-	, '' as 'Canal'
+	, 4 as 'Canal'
 	, CONVERT(VARCHAR(10),fecha,105) as Fecha
 	, cast(declaracion as varchar(2000)) as Descripcion 
 	, '' as "Estado" 
@@ -299,7 +299,7 @@ Select
 	, CAST('' as date) as 'Fecha_nacimiento'
 	, '' as 'Folio' 
 	, 05 as "Interaccion"
-	, '' as 'Canal'
+	, null as 'Canal'
 	, CONVERT(VARCHAR(10),fecha,105) as Fecha
 	, cast(declaracion as varchar(2000)) as Descripcion 
 	, '' as "Estado"
@@ -324,7 +324,7 @@ select
 	, CAST(MenFechaNac as date) as 'Fecha_nacimiento'
 	, '' as 'Folio' 
 	, 06 as "Interaccion"
-	, '' as 'Canal'
+	, 1 as 'Canal'
 	,CONVERT(VARCHAR(10),FechaReg,105) as Fecha
 	, CAST('Nomina Menor' as varchar(2000)) as Descripcion 
 	, '' as "Estado"
@@ -346,7 +346,7 @@ select
 	, CAST(SolFechaNac as date) as 'Fecha_nacimiento'
 	, '' as 'Folio' 
 	, 06 as "Interaccion"
-	, '' as 'Canal'
+	, 1 as 'Canal'
 	, CONVERT(VARCHAR(10),FechaOrigen,105) as Fecha
 	, cast('Ingreso Fiscalizacion' as varchar(2000)) as Descripcion 
 	, '' as "Estado"
@@ -367,7 +367,7 @@ Select
 	, CAST('' as date) as 'Fecha_nacimiento'
 	, '' as 'Folio' 
 	, 07 as "Interaccion"
-	, '' as 'Canal'
+	, null as 'Canal'
 	, CONVERT(VARCHAR(10),FechaReg,105) as Fecha
 	,'Certificado AFC' as Descripcion 
 	, '' as "Estado" 
@@ -388,7 +388,7 @@ select
 	, CAST('' as date) as 'Fecha_nacimiento'
 	, '' as 'Folio' 
 	, 08 as "Interaccion"
-	, '' as 'Canal'
+	, null as 'Canal'
 	, CONVERT(VARCHAR(10),FechaReg,105) as Fecha
 	, cast(Motivo as varchar(2000)) as Descripcion 
 	, '' as "Estado" 
@@ -409,7 +409,7 @@ Select
 	, CAST('' as date) as 'Fecha_nacimiento'
 	, '' as 'Folio' 
 	, 09 as "Interaccion"
-	, '' as 'Canal'
+	, null as 'Canal'
 	,CONVERT(VARCHAR(10),FechaReg,105) as Fecha
 	, cast(Declaracion as varchar(2000)) as Descripcion 
 	, '' as "Estado"
@@ -430,7 +430,7 @@ Select
 	, CAST('' as date) as 'Fecha_nacimiento'
 	, '' as 'Folio' 
 	, 10 as "Interaccion"
-	, '' as 'Canal'
+	, null as 'Canal'
 	,CONVERT(VARCHAR(10),FechaReg,105) as Fecha
 	,cast('Finiquito' as varchar(2000)) as Descripcion 
 	, '' as "Estado"
@@ -451,7 +451,7 @@ Select
 	, CAST('' as date) as 'Fecha_nacimiento'
 	, '' as 'Folio' 
 	, 11 as "Interaccion"
-	, '' as 'Canal'
+	, null as 'Canal'
 	,CONVERT(VARCHAR(10),FechaReg,105) as Fecha
 	,cast('Renuncia' as varchar(2000)) as Descripcion 
 	, '' as "Estado"
@@ -472,7 +472,7 @@ Select
 	, CAST('' as date) as 'Fecha_nacimiento'
 	, '' as 'Folio' 
 	, 12 as "Interaccion"
-	, '' as 'Canal'
+	, null as 'Canal'
 	,CONVERT(VARCHAR(10),FechaReg,105) as Fecha
 	,cast('Termino Contrato TCP' as varchar(2000)) as Descripcion 
 	, '' as "Estado"
@@ -493,7 +493,7 @@ Select
 	, CAST('' as date) as 'Fecha_nacimiento'
 	, '' as 'Folio' 
 	, 13 as "Interaccion"
-	, '' as 'Canal'
+	, null as 'Canal'
 	,CONVERT(VARCHAR(10),FechaReg,105) as Fecha
 	, CAST('Termino de contrato' as varchar(2000)) as Descripcion 
 	, '' as "Estado"
@@ -514,7 +514,7 @@ Select
 	, CAST('' as date) as 'Fecha_nacimiento'
 	, '' as 'Folio' 
 	, 14 as "Interaccion"
-	, '' as 'Canal'
+	, null as 'Canal'
 	,CONVERT(VARCHAR(10),FechaReg,105) as Fecha
 	, CAST('Contrato menores' as varchar(2000)) as Descripcion 
 	, '' as "Estado"
@@ -535,7 +535,7 @@ select
 	, CAST('' as date) as 'Fecha_nacimiento'
 	, '' as 'Folio' 
 	, 15 as "Interaccion"
-	, '' as 'Canal'
+	, 1 as 'Canal'
 	, CONVERT(VARCHAR(10),FechaReg,105) as Fecha
 	, CAST(motivo as varchar(2000)) as Descripcion 
 	, '' as "Estado"
@@ -555,7 +555,7 @@ select
 	, CAST(fechaNacimiento as date) as 'Fecha_nacimiento'
 	, '' as 'Folio' 
 	, 16 as "Interaccion"
-	, '' as 'Canal'
+	, 4 as 'Canal'
 	, CAST('' as varchar(10)) as Fecha
 	, CAST('TCP Trabajador' as varchar(2000)) as Descripcion 
 	, '' as "Estado"
@@ -579,7 +579,7 @@ select
 	, cast(isnull(Fecha_Nacimiento,'') as datetime) as 'Fecha Nacimiento'
 	, '' as 'Folio' 
 	, 17 as "Interaccion"
-	, '' as 'Canal'
+	, 4 as 'Canal'
 	, CONVERT(VARCHAR(10),Fecha_Registro,105) as Fecha
 	, CAST('Inclusion Trabajadores' as varchar(2000)) as Descripcion 
 	, '' as "Estado"
@@ -603,7 +603,7 @@ select
 	, CAST('' as date) as 'Fecha_nacimiento'
 	, '' as 'Folio' 
 	, 18 as "Interaccion"
-	, '' as 'Canal'
+	, null as 'Canal'
 	, CONVERT(VARCHAR(10),FechaReg,105) as Fecha
 	, cast(MotivoNeg as varchar(2000)) as Descripcion 
 	, '' as "Estado"
