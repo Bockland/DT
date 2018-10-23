@@ -1,37 +1,61 @@
 --01 - DENUNCIAS -------------------------------
+DECLARE @INTERACCION AS INT = 1;
+DECLARE @CANAL AS INT = 1;
 select 
-	CAST(RutAcc as int) as RUT
-	, cast(DvAcc as varchar(10)) as DV
-	, (isnull(LTRIM(RTRIM(NomAcc)),'')+' '+isnull(LTRIM(RTRIM(ApePatAcc)),'')+' '+isnull(LTRIM(RTRIM(ApeMatAcc)),'')) as Nombre
-	, '' as Sexo
-	,CAST('' as date) as 'Fecha_nacimiento'
-	,'' as 'Folio' 
-	,01 as "Interaccion"
-	,1 as 'Canal'
-	, CONVERT(VARCHAR(10),FecAcc,105) as Fecha
+	CASE 
+		WHEN ISNUMERIC(RutAcc) = 1
+		THEN CAST(RutAcc as int)
+		ELSE NULL
+	END as RUT
+	, CASE 
+		WHEN ISDATE(FecAcc) = 1 
+		THEN CAST(FecAcc as date) 
+		ELSE NULL
+	 END as Fecha
+	, cast(DvAcc as char(1)) as DV
+	, CAST(CONCAT(isnull(LTRIM(RTRIM(NomAcc)),''), ' ', isnull(LTRIM(RTRIM(ApePatAcc)),''), ' ', isnull(LTRIM(RTRIM(ApeMatAcc)),'')) as varchar(300)) as Nombre 
 	, CAST(DescripcionYHecho as varchar(2000)) as Descripcion
-	, Estado as "Estado"
-	,CAST(comuna as varchar(50)) as Comuna
+	, CAST(Estado as varchar(200)) as Estado
+	, CAST(comuna as varchar(50)) as Comuna
+	, @INTERACCION as Interaccion
+	, @CANAL as Canal
+	, NULL as Sexo
+	, NULL as Fecha_nacimiento
+	, NULL as Folio
+	, NULL as Telefono
 from [dirtrab_plus].[dbo].[AccidentesLaborales] 
 where 
 	ISNUMERIC(RutAcc)=1 
-	and RutAcc <>1
+	and RutAcc<>1
 
 Union all
 
 select 
-	cast(SolRut as int) as RUT
-	,cast(SolDV as varchar(10)) as DV
-	, CAST(isnull(LTRIM(RTRIM(SolNombres)),'') +' '+isnull(LTRIM(RTRIM(SolMaterno)),'')+' '+isnull(LTRIM(RTRIM(SolPaterno)),'') as Varchar(250)) as Nombre
-	, '' as Sexo
-	,cast(SolFechaNac as date) as 'Fecha_nacimiento'
-	,'' as 'Folio'
-	,01 as "Interaccion"
-	,1 as 'Canal'
-	, CONVERT(VARCHAR(10),FechaRegistro,105) as Fecha
+	CASE 
+		WHEN ISNUMERIC(SolRut) = 1
+		THEN CAST(SolRut as int)
+		ELSE NULL
+	END as RUT
+	, CASE 
+		WHEN ISDATE(FechaRegistro) = 1 
+		THEN CAST(FechaRegistro as date) 
+		ELSE NULL
+	 END as Fecha
+	, cast(SolDV as char(1)) as DV
+	, CAST(CONCAT(isnull(LTRIM(RTRIM(SolNombres)),''), ' ', isnull(LTRIM(RTRIM(SolMaterno)),''), ' ', isnull(LTRIM(RTRIM(SolPaterno)),'')) as varchar(300)) as Nombre 	
 	, CAST(declaracionDenunciante as varchar(2000)) as Descripcion
-	, '' as "Estado"
-	,CAST(SolIdCoumna as varchar(50)) as Comuna
+	, NULL as Estado
+	, CAST(SolIdCoumna as varchar(50)) as Comuna
+	, @INTERACCION as Interaccion
+	, @CANAL as Canal
+	, NULL as Sexo	
+	, CASE 
+		WHEN ISDATE(SolFechaNac) = 1 
+		THEN CAST(SolFechaNac as date) 
+		ELSE NULL
+	 END as Fecha_nacimiento
+	, NULL as Folio
+	, NULL as Telefono
 FROM [dirtrab_plus].[dbo].[df_IngresoSolicitud] 
 WHERE 
 	SolRut IS NOT NULL 
@@ -39,18 +63,31 @@ WHERE
 	and SolRut<>1
 ------------------------------------------------
 --02 - CERTIFICADOS ----------------------------
+DECLARE @INTERACCION AS INT = 2;
+DECLARE @CANAL AS INT = 4;
+DECLARE @DIA AS VARCHAR(2) = '12';
+DECLARE @DESCRIPCION_1 AS VARCHAR(30) = 'Certificado Nomina Trabajador';
+DECLARE @DESCRIPCION_2 AS VARCHAR(30) = 'Dato Previsional';
+DECLARE @DESCRIPCION_3 AS VARCHAR(30) = 'Detalle Despido';
+DECLARE @DESCRIPCION_5 AS VARCHAR(30) = 'Certificado Nomina Trabajador';
 SELECT 
-	cast(TrabRut as int) as RUT
-	, cast(TrabDv as varchar(10)) as DV
-	, CAST(TrabNombre as varchar(250)) as Nombre 
-	,'' as Sexo
-	,CAST('' as date) as 'Fecha_nacimiento'
-	,'' as 'Folio' 
-	, 02 as "Interaccion"
-	,4 as 'Canal'
-	,CASE WHEN PeriodoMes BETWEEN 0 AND 10 THEN RIGHT('0' + CAST(PeriodoMes AS VARCHAR(2)), 2)ELSE CAST(PeriodoMes AS VARCHAR(10))END+'-'+cast(PeriodoAgno as varchar(10)) as Fecha
-	,'Certificado Nomina Trabajador' as Descripcion 
-	, '' as "Estado"
+	CASE 
+		WHEN ISNUMERIC(TrabRut) = 1
+		THEN CAST(TrabRut as int)
+		ELSE NULL
+	END as RUT
+	, CAST(@DIA + '-' + CASE WHEN PeriodoMes BETWEEN 0 AND 10 THEN RIGHT('0' + CAST(PeriodoMes AS VARCHAR(2)), 2)ELSE CAST(PeriodoMes AS VARCHAR(10))END+'-'+cast(PeriodoAgno as varchar(10)) as date) as Fecha
+	, cast(TrabDv as char(1)) as DV
+	, CAST(LTRIM(RTRIM(TrabNombre)) as varchar(300)) as Nombre 
+	, @INTERACCION as Interaccion
+	, @CANAL as Canal
+	, @DESCRIPCION_1 as Descripcion 	
+	, NULL as Sexo
+	, NULL as Fecha_nacimiento
+	, NULL as Folio
+	, NULL as Estado
+	, NULL as Comuna 
+	, NULL as Telefono
 FROM [dirtrab_plus].[dbo].[cert_NominaTrab] 
 where 
 	TrabRut !=0 
@@ -59,17 +96,27 @@ where
 Union all
 
 SELECT 
-	cast(RutTrabajador as int) as RUT
-	, DVTrabajador as DV
-	, (isnull(LTRIM(RTRIM(NombreTrabajador)),'')) AS Nombre
-	,'' as Sexo
-	,CAST('' as date) as 'Fecha_nacimiento'
-	,'' as 'Folio' 
-	, 02 as "Interaccion"
-	,4 as 'Canal'
-	, cast(RIGHT(periodoMesAno,2)+'-'+SUBSTRING(periodoMesAno,1,4) as varchar(10)) as Fecha
-	, 'Dato Previsional' as Descripcion 
-	, '' as "Estado"
+	CASE 
+		WHEN ISNUMERIC(RutTrabajador) = 1
+		THEN CAST(RutTrabajador as int)
+		ELSE NULL
+	END as RUT
+	, CASE
+		WHEN ISDATE(periodoMesAno) = 1 
+		THEN NULL
+		ELSE cast(CONCAT(@DIA, '-', RIGHT(periodoMesAno,2), '-', SUBSTRING(periodoMesAno,1,4)) as date)
+	END as Fecha
+	, cast(DVTrabajador as char(1)) as DV
+	, CAST(LTRIM(RTRIM(NombreTrabajador)) as varchar(300)) as Nombre 
+	, @INTERACCION as Interaccion
+	, @CANAL as Canal
+	, @DESCRIPCION_2 as Descripcion 
+	, NULL as Sexo
+	, NULL as Fecha_nacimiento
+	, NULL as Folio
+	, NULL as Estado
+	, NULL as Comuna 
+	, NULL as Telefono
 FROM [ventanilla].[dbo].[CCL_DatoPrevisional2]
 where 
 	RutTrabajador is not null 
@@ -81,17 +128,27 @@ where
 union all
 
 Select 
-	CAST(ruttrab as int) RUT
-	, CAST(DVTrab AS VARCHAR(10)) AS DV
-	, cast((isnull(LTRIM(RTRIM(NombreTrab)),'')+' '+ isnull(LTRIM(RTRIM(ApPaternoTrab)),'')+' '+isnull(LTRIM(RTRIM(ApMaternoTrab)),'')) as Varchar(255)) as Nombre
-	,'' as Sexo
-	,CAST('' as date) as 'Fecha_nacimiento'
-	,'' as 'Folio' 
-	, 02 as "Interaccion"
-	,4 as 'Canal'
-	, cast((CASE WHEN MesDespido BETWEEN 0 AND 10 THEN RIGHT('0' + CAST(MesDespido AS VARCHAR(2)), 2)ELSE CAST(MesDespido AS VARCHAR(10))END)+'-'+cast(AnoDespido as varchar(10)) as varchar(10)) as Fecha
-	, cast('Detalle Despido' as varchar(2000)) as Descripcion 
-	, '' as "Estado" 
+	CASE 
+		WHEN ISNUMERIC(ruttrab) = 1
+		THEN CAST(ruttrab as int)
+		ELSE NULL
+	END as RUT
+	, CASE 
+		WHEN (LEN(MesDespido) BETWEEN 1 AND 2) AND (LEN(AnoDespido) = 4)
+		THEN cast(CONCAT(@DIA, '-' ,(CASE WHEN MesDespido BETWEEN 0 AND 10 THEN RIGHT('0' + CAST(MesDespido AS VARCHAR(2)), 2)ELSE CAST(MesDespido AS VARCHAR(10))END), '-' , cast(AnoDespido as varchar(10))) as date)
+		ELSE NULL
+	END as Fecha
+	, cast(DVTrab as char(1)) as DV	
+	, cast((isnull(LTRIM(RTRIM(NombreTrab)),'')+' '+ isnull(LTRIM(RTRIM(ApPaternoTrab)),'')+' '+isnull(LTRIM(RTRIM(ApMaternoTrab)),'')) as Varchar(300)) as Nombre
+	, @INTERACCION as Interaccion
+	, @CANAL as Canal
+	, @DESCRIPCION_3 as Descripcion 
+	, NULL as Sexo
+	, NULL as Fecha_nacimiento
+	, NULL as Folio
+	, NULL as Estado
+	, NULL as Comuna 
+	, NULL as Telefono
 FROM [ventanilla].[dbo].[CCL_DetalleDespido]
 where 
 	RutTrab is not null 
@@ -102,34 +159,59 @@ where
 Union all
 
 select 
-	CAST(RutTrab as int) as RUT
-	, cast(DVTrab as varchar(10)) as DV
- 	, cast((isnull(LTRIM(RTRIM(NombreTrab)),'')+' '+isnull(LTRIM(RTRIM(ApPaternoTrab)),'')+' '+isnull(LTRIM(RTRIM(ApMaternoTrab)),'')) as VARCHAR(255)) AS Nombre 
-	,'' as Sexo
-	,CAST('' as date) as 'Fecha_nacimiento'
-	,'' as 'Folio' 
-	, 02 as "Interaccion"
-	,4 as 'Canal'
-	, '' as Fecha
+	CASE 
+		WHEN ISNUMERIC(RutTrab) = 1
+		THEN CAST(RutTrab as int)
+		ELSE NULL
+	END as RUT
+	, NULL as Fecha
+	, cast(DVTrab as char(1)) as DV	
+ 	, cast((isnull(LTRIM(RTRIM(NombreTrab)),'')+' '+isnull(LTRIM(RTRIM(ApPaternoTrab)),'')+' '+isnull(LTRIM(RTRIM(ApMaternoTrab)),'')) as VARCHAR(300)) AS Nombre 
+	, @INTERACCION as Interaccion
+	, @CANAL as Canal
 	, cast(DetalleMensajeCuadratura as varchar(2000)) as Descripcion 
-	, '' as "Estado" 
+	, NULL as Sexo
+	, NULL as Fecha_nacimiento
+	, NULL as Folio
+	, NULL as Estado
+	, NULL as Comuna 
+	, NULL as Telefono
 FROM [ventanilla].[dbo].[CCL_DetalleLAR]  
-where RutTrab is not null and ISNUMERIC(RutTrab)<>0 and RutTrab<>0 and NombreTrab !='' and RutTrab<>1
+where 
+	RutTrab is not null 
+	and ISNUMERIC(RutTrab)<>0 
+	and RutTrab<>0 
+	and NombreTrab!='' 
+	and RutTrab<>1
 
 Union all
 
 select 
-	cast(Rut as int) as RUT
-	, CAST(Dv as varchar(10)) as DV
-	, cast((isnull(LTRIM(RTRIM(Nombre)),'')+' '+isnull(LTRIM(RTRIM(Paterno)),'')+' '+isnull(LTRIM(RTRIM(Materno)),'')) as varchar(250)) as Nombre
-	, cast(case Sexo when '2' then 'M' when '1' then 'F' end as varchar(10)) as Sexo
-	,CAST('' as date) as 'Fecha_nacimiento'
-	,'' as 'Folio' 
-	, 02 as "Interaccion"
-	,4 as 'Canal'
-	,CONVERT(VARCHAR(10),FechaInicio,105) as Fecha
-	, CAST('Certificado Nomina Trabajador' as varchar(2000)) as Descripcion 
-	, '' as "Estado"
+	CASE 
+		WHEN ISNUMERIC(Rut) = 1
+		THEN CAST(Rut as int)
+		ELSE NULL
+	END as RUT
+	, CASE
+		WHEN ISDATE(FechaInicio) = 1 
+		THEN NULL
+		ELSE cast(FechaInicio as date)
+	END as Fecha
+	, cast(Dv as char(1)) as DV	
+	, cast((isnull(LTRIM(RTRIM(Nombre)),'')+' '+isnull(LTRIM(RTRIM(Paterno)),'')+' '+isnull(LTRIM(RTRIM(Materno)),'')) as varchar(300)) as Nombre
+	, @INTERACCION as Interaccion
+	, @CANAL as Canal
+	, @DESCRIPCION_5 as Descripcion 
+	, CASE 
+		WHEN Sexo IS NULL
+		THEN NULL
+		ELSE cast(Sexo as char(1))
+	END as Sexo 
+	, NULL as Fecha_nacimiento
+	, NULL as Folio 
+	, NULL as Estado
+	, NULL as Comuna 
+	, NULL as Telefono
 FROM [notarios].[dbo].[TrabNomina]
 WHERE 
 	Rut IS NOT NULL AND ISNUMERIC(Rut)<>0 
@@ -137,19 +219,31 @@ WHERE
 	AND Rut<>1
 -------------------------------------------------
 --03 - RECLAMOS ---------------------------------
+DECLARE @INTERACCION AS INT = 3;
+DECLARE @CANAL_1 AS INT = 1;
+DECLARE @CANAL_4 AS INT = 4;
+DECLARE @DESCRIPCION_1 AS VARCHAR(30) = 'Trabajo Asesor';
+DECLARE @DESCRIPCION_2 AS VARCHAR(30) = 'Otro Afectado';
+DECLARE @DESCRIPCION_3 AS VARCHAR(30) = 'Reclamos Reclamante';
+DECLARE @DESCRIPCION_4 AS VARCHAR(30) = 'Datos Asistentes Trabajador';
 SELECT 
-	CAST(RUT as int) as RUT
-	, CAST(Dv as varchar(10)) as DV
-	, (isnull(LTRIM(RTRIM(NOMBRE_COMPLETO)),'')+' '+isnull(LTRIM(RTRIM(APELLIDO_PATERNO)),'')+' '+isnull(LTRIM(RTRIM(APELLIDO_MATERNO)),'')) as Nombre  
-	, '' as Sexo
-	,CAST('' as date) as 'Fecha_nacimiento'
-	,'' as 'Folio' 
-	, 03 as "Interaccion"
-	,4 as 'Canal'
-	, '' as Fecha
-	, 'Trabajo Asesor' as Descripcion 
-	, '' as "Estado"
-	,CAST('' as varchar(50)) as Comuna
+	CASE 
+		WHEN ISNUMERIC(RUT) = 1
+		THEN CAST(RUT as int)
+		ELSE NULL
+	END as RUT
+	, cast(Dv as char(1)) as DV	
+	, cast(CONCAT(isnull(LTRIM(RTRIM(NOMBRE_COMPLETO)),''), ' ', isnull(LTRIM(RTRIM(APELLIDO_PATERNO)),''), ' ', isnull(LTRIM(RTRIM(APELLIDO_MATERNO)),'')) as varchar(300)) as Nombre
+	, @INTERACCION as Interaccion
+	, @CANAL_4 as Canal
+	, @DESCRIPCION_1 as Descripcion 
+	, NULL as Sexo
+	, NULL as Fecha_nacimiento
+	, NULL as Folio 
+	, NULL as Fecha
+	, NULL as Estado
+	, NULL as Comuna 
+	, NULL as Telefono
 FROM [conciliaplus].[dbo].[TRABAJADOR_ASESOR] 
 WHERE 
 	Rut IS NOT NULL 
@@ -160,18 +254,23 @@ WHERE
 Union all
 
 SELECT 
-	cast(Rut as int) as RUT
-	, cast(Dv as varchar(10)) as DV
-	, cast((isnull(LTRIM(RTRIM(Nombres)),'')+' '+isnull(LTRIM(RTRIM(Paterno)),'')+' '+isnull(LTRIM(RTRIM(Materno)),'')) as varchar(250)) as Nombre
-	, cast(Sexo as varchar(10)) as Sexo 
-	, CAST('' as date) as 'Fecha_nacimiento'
-	, '' as 'Folio' 
-	, 03 as "Interaccion"
-	, 1 as 'Canal'
-	, '' as Fecha
-	, CAST('Otro Afectado' as varchar(2000)) as Descripcion 
-	, '' as "Estado" 
-	,CAST('' as varchar(50)) as Comuna
+	CASE 
+		WHEN ISNUMERIC(Rut) = 1
+		THEN CAST(Rut as int)
+		ELSE NULL
+	END as RUT
+	, cast(Dv as char(1)) as DV	
+	, cast(CONCAT(isnull(LTRIM(RTRIM(Nombres)),''), ' ', isnull(LTRIM(RTRIM(Paterno)),''), ' ' , isnull(LTRIM(RTRIM(Materno)),'')) as varchar(300)) as Nombre	
+	, @INTERACCION as Interaccion
+	, @CANAL_1 as Canal
+	, @DESCRIPCION_2 as Descripcion 
+	, cast(Sexo as char(1)) as Sexo 
+	, NULL as Fecha_nacimiento
+	, NULL as Folio 
+	, NULL as Fecha
+	, NULL as Estado
+	, NULL as Comuna 
+	, NULL as Telefono
 FROM [dirtrab_plus].[dbo].[df_OtroAfectado] 
 WHERE 
 	Rut IS NOT NULL 
@@ -182,18 +281,31 @@ WHERE
 Union all
 
 select 
-	cast(Rut as int) as RUT
-	, CAST(Dv AS VARCHAR(10)) AS DV
-	, CAST(isnull(LTRIM(RTRIM(Nombre)),'')+' '+isnull(LTRIM(RTRIM(Paterno)),'')++isnull(LTRIM(RTRIM(Materno)),'') AS varchar(250)) as Nombre
-	, cast(ISNULL((Sexo),'') as varchar(10)) as Sexo 
-	, CAST(FechaNac as date) as 'Fecha_nacimiento'
-	, '' as 'Folio' 
-	, 03 as "Interaccion"
-	, 1 as 'Canal'
-	, CONVERT(VARCHAR(10),FecInicioRL,105) as Fecha
-	, CAST('Reclamos Reclamante' as varchar(2000)) as Descripcion 
-	, '' as "Estado"
-	,CAST('' as varchar(50)) as Comuna
+	CASE 
+		WHEN ISNUMERIC(Rut) = 1
+		THEN CAST(Rut as int)
+		ELSE NULL
+	END as RUT
+	, CAST(Dv AS char(1)) AS DV
+	, CAST(CONCAT(isnull(LTRIM(RTRIM(Nombre)),''), ' ', isnull(LTRIM(RTRIM(Paterno)),''), ' ', isnull(LTRIM(RTRIM(Materno)),'')) AS varchar(300)) as Nombre
+	, @INTERACCION as Interaccion
+	, @CANAL_1 as Canal
+	, @DESCRIPCION_3 as Descripcion 
+	, cast(Sexo as char(1)) as Sexo 
+	, CASE
+		WHEN ISDATE(FechaNac) = 1 
+		THEN NULL
+		ELSE cast(FechaNac as date)
+	END as Fecha_nacimiento
+	, NULL as Folio 
+	, CASE
+		WHEN ISDATE(FecInicioRL) = 1 
+		THEN NULL
+		ELSE cast(FecInicioRL as date)
+	END as Fecha
+	, NULL as Estado
+	, NULL as Comuna 
+	, NULL as Telefono
 FROM [dirtrab_plus].[dbo].[rec_Reclamante]
 WHERE 
 	Rut IS NOT NULL 
@@ -203,18 +315,31 @@ WHERE
 Union all
 
 select 
-	cast(RUT as int) as RUT
-	, cast(DV as varchar(10)) as DV
-	, cast((isnull(LTRIM(RTRIM(NOMBRES)),'')+' '+isnull(LTRIM(RTRIM(APELLIDO_PATERNO)),'')+' '+isnull(LTRIM(RTRIM(APELLIDO_MATERNO)),'')) as varchar(250)) as Nombre
-	, cast(case SEXO when '1' then 'M' when '2' then 'F' end as varchar(10)) as Sexo
-	, CAST(FECHA_NACIMIENTO as date) as 'Fecha_nacimiento'
-	, '' as 'Folio' 
-	, 03 as "Interaccion"
-	, 1 as 'Canal'
-	,cast('' as varchar(10)) as Fecha
-	,'Datos Asistentes Trabajador' as Descripcion 
-	, '' as "Estado"
-	,CAST(DIR_ID_COMUNA as varchar(50)) as Comuna
+	CASE 
+		WHEN ISNUMERIC(Rut) = 1
+		THEN CAST(Rut as int)
+		ELSE NULL
+	END as RUT
+	, cast(DV as char(1)) as DV
+	, cast(CONCAT(isnull(LTRIM(RTRIM(NOMBRES)),''), ' ', isnull(LTRIM(RTRIM(APELLIDO_PATERNO)),''), ' ', isnull(LTRIM(RTRIM(APELLIDO_MATERNO)),'')) as varchar(300)) as Nombre
+	, @INTERACCION as Interaccion
+	, @CANAL_1 as Canal
+	, @DESCRIPCION_4 as Descripcion 
+	, CASE
+		WHEN SEXO IS NULL
+		then NULL
+		ELSE cast(case SEXO when '1' then 'M' when '2' then 'F' end as char(1))
+	END as Sexo
+	, CASE
+		WHEN ISDATE(FECHA_NACIMIENTO) = 1 
+		THEN NULL
+		ELSE cast(FECHA_NACIMIENTO as date)
+	END as Fecha_nacimiento
+	, NULL as Folio 
+	, NULL as Fecha
+	, NULL as Estado
+	, CAST(DIR_ID_COMUNA as varchar(50)) as Comuna
+	, NULL as Telefono
 FROM [conciliaplus].[dbo].[DATOS_ASISTENTES_TRABAJADOR]
 WHERE 
 	Rut IS NOT NULL 
@@ -223,19 +348,30 @@ WHERE
 	AND RUT<>1
 -------------------------------------------------
 --04 - CARTA DE AVISO ---------------------------
+DECLARE @INTERACCION AS INT = 4;
+DECLARE @CANAL AS INT = 4;
 select 
-	cast(RutTrab as int) AS RUT
-	, cast(DVTrab as varchar(10)) as DV
-	, cast((isnull(LTRIM(RTRIM(NombresTrab)),'')+' '+isnull(LTRIM(RTRIM(ApPaternoTrab)),'')+' '+isnull(LTRIM(RTRIM(ApMaternoTrab)),'')) as Varchar(255)) as Nombre
-	, Sexo as Sexo
-	, CAST('' as date) as 'Fecha_nacimiento'
-	, '' as 'Folio' 
-	, 04 as "Interaccion"
-	, 4 as 'Canal'
-	, CONVERT(VARCHAR(10),fechaIngreso,105) as Fecha
+	CASE 
+		WHEN ISNUMERIC(RutTrab) = 1
+		THEN CAST(RutTrab as int)
+		ELSE NULL
+	END as RUT
+	, cast(DVTrab as char(1)) as DV
+	, cast(CONCAT(isnull(LTRIM(RTRIM(NombresTrab)),''), ' ', isnull(LTRIM(RTRIM(ApPaternoTrab)),''), ' ', isnull(LTRIM(RTRIM(ApMaternoTrab)),'')) as Varchar(300)) as Nombre
+	, @INTERACCION as Interaccion
+	, @CANAL as Canal
 	, cast(DescripcionHecho as varchar(2000)) as Descripcion 
+	, cast(Sexo as char(1)) as Sexo 
+	, NULL as Fecha_nacimiento
+	, NULL as Folio	
+	, CASE
+		WHEN ISDATE(fechaIngreso) = 1 
+		THEN NULL
+		ELSE cast(fechaIngreso as date)
+	END as Fecha
 	, cast(EstadoCotizaciones as varchar(200)) as Estado
-	,CAST(IdComunaTrabajo as varchar(50)) as Comuna
+	, CAST(IdComunaTrabajo as varchar(50)) as Comuna
+	, NULL as Telefono
 FROM [ventanilla].[dbo].[Ven_CartaAviso_Trabajador_Itel] 
 WHERE 
 	RutTrab IS NOT NULL 
@@ -247,18 +383,27 @@ WHERE
 Union all
 
 select 
-	cast(TrabRut as int) as RUT
-	, cast(TrabDv as varchar(10)) as DV
-	, cast((isnull(LTRIM(RTRIM(TrabNombres)),'')+' '+isnull(LTRIM(RTRIM(TrabApPaterno)),'')+' '+isnull(LTRIM(RTRIM(TrabApMaterno)),'')) as varchar(250)) as Nombre
-	, cast(case TrabSexo  when 'A' then 'M' when 'D' then 'M' when 'F' then 'F' when 'H' then 'M' when 'L' then 'F' when 'M' then 'M' when '0' then 'M' when 'R' then 'M' when null then '' end as varchar(10)) as Sexo
-	, CAST('' as date) as 'Fecha_nacimiento'
-	, '' as 'Folio' 
-	, 04 as "Interaccion"
-	, 4 as 'Canal'
-	, CONVERT(VARCHAR(10),FechaReg,105) as Fecha
+	CASE 
+		WHEN ISNUMERIC(TrabRut) = 1
+		THEN CAST(TrabRut as int)
+		ELSE NULL
+	END as RUT
+	, cast(TrabDv as char(1)) as DV
+	, cast(CONCAT(isnull(LTRIM(RTRIM(TrabNombres)),''), ' ', isnull(LTRIM(RTRIM(TrabApPaterno)),''), ' ', isnull(LTRIM(RTRIM(TrabApMaterno)),'')) as varchar(300)) as Nombre
+	, @INTERACCION as Interaccion
+	, @CANAL as Canal
 	, CAST(HechosCausal as varchar(2000)) as Descripcion 
+	, cast(case TrabSexo  when 'A' then 'M' when 'D' then 'M' when 'F' then 'F' when 'H' then 'M' when 'L' then 'F' when 'M' then 'M' when '0' then 'M' when 'R' then 'M' when null then '' end as char(1)) as Sexo
+	, NULL as Fecha_nacimiento
+	, NULL as Folio	
+	, CASE
+		WHEN ISDATE(FechaReg) = 1 
+		THEN NULL
+		ELSE cast(FechaReg as date)
+	END as Fecha
 	, cast(EstadoCotizaciones as varchar(200)) as Estado
-	,CAST('' as varchar(50)) as Comuna
+	, NULL as Comuna
+	, NULL as Telefono
 FROM [ventanilla].[dbo].[ven_CartaAvisoMasivaTrabajador]
 where TrabRut is not null 
 	and ISNUMERIC(TrabRut)<>0 
@@ -267,19 +412,30 @@ where TrabRut is not null
 	and TrabRut<>1
 -------------------------------------------------
 --05 - CONSTANCIA -------------------------------
+DECLARE @INTERACCION AS INT = 5;
+DECLARE @CANAL AS INT = 4;
 select 
-	cast(rut_dec as int) as RUT
-	, CAST(dv_dec AS VARCHAR(255)) as DV
-	, cast((isnull(LTRIM(RTRIM(nombres_dec)),'')+' '+isnull(LTRIM(RTRIM(ap_paterno_dec)),'')+' '+isnull(LTRIM(RTRIM(ap_materno_dec)),'')) as varchar(255)) as Nombre 
-	, '' as Sexo
-	, CAST('' as date) as 'Fecha_nacimiento'
-	, '' as 'Folio' 
-	, 05 as "Interaccion"
-	, 4 as 'Canal'
-	, CONVERT(VARCHAR(10),fecha,105) as Fecha
+	CASE 
+		WHEN ISNUMERIC(rut_dec) = 1
+		THEN CAST(rut_dec as int)
+		ELSE NULL
+	END as RUT
+	, CAST(dv_dec AS char(1)) as DV
+	, cast(CONCAT(isnull(LTRIM(RTRIM(nombres_dec)),''), ' ', isnull(LTRIM(RTRIM(ap_paterno_dec)),''), ' ', isnull(LTRIM(RTRIM(ap_materno_dec)),'')) as varchar(300)) as Nombre 
+	, CASE
+		WHEN ISDATE(fecha) = 1 
+		THEN NULL
+		ELSE cast(fecha as date)
+	END as Fecha
 	, cast(declaracion as varchar(2000)) as Descripcion 
-	, '' as "Estado" 
-	,CAST('' as varchar(50)) as Comuna
+	, @INTERACCION as Interaccion
+	, @CANAL as Canal
+	, NULL as Sexo
+	, NULL as Fecha_nacimiento
+	, NULL as Folio 
+	, NULL as Estado
+	, NULL as Comuna
+	, NULL as Telefono
 FROM [ventanilla].[dbo].[Ven_Constancia]
 where 
 	rut_dec is not null 
@@ -292,18 +448,27 @@ where
 Union all
 
 Select 
-	cast(RUT as int) as RUT
-	, CAST(Dv_Dec as varchar(255)) as DV
-	, cast((isnull(LTRIM(RTRIM(NombreDec)),'')+' '+ isnull(LTRIM(RTRIM(ApPaterno)),'')+' '+ isnull(LTRIM(RTRIM(ApMaterno)),'')) as varchar(255)) as Nombre
-	, '' as Sexo
-	, CAST('' as date) as 'Fecha_nacimiento'
-	, '' as 'Folio' 
-	, 05 as "Interaccion"
-	, null as 'Canal'
-	, CONVERT(VARCHAR(10),fecha,105) as Fecha
-	, cast(declaracion as varchar(2000)) as Descripcion 
-	, '' as "Estado"
-	,CAST(comuna as varchar(50)) as Comuna
+	CASE 
+		WHEN ISNUMERIC(RUT) = 1
+		THEN CAST(RUT as int)
+		ELSE NULL
+	END as RUT
+	, CAST(Dv_Dec as char(1)) as DV
+	, cast(CONCAT(isnull(LTRIM(RTRIM(NombreDec)),''), ' ', isnull(LTRIM(RTRIM(ApPaterno)),''), ' ', isnull(LTRIM(RTRIM(ApMaterno)),'')) as varchar(300)) as Nombre
+	, CASE
+		WHEN ISDATE(fecha) = 1 
+		THEN NULL
+		ELSE cast(fecha as date)
+	END as Fecha
+	, cast(declaracion as varchar(2000)) as Descripcion  
+	, @INTERACCION as Interaccion
+	, NULL as Canal
+	, NULL as Sexo
+	, NULL as Fecha_nacimiento
+	, NULL as Folio 
+	, NULL as Estado
+	, CAST(comuna as varchar(50)) as Comuna
+	, NULL as Telefono
 FROM [ventanilla].[dbo].[Ven_Constancia_Itel]
 where 
 	RutDec is not null 
