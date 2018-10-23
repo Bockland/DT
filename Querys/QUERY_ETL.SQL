@@ -483,7 +483,7 @@ where
 --06 - FISCALIZACION ----------------------------
 Declare @Interaccion as int = 6;
 Declare @Canal as int = 1;
-SELECT top 10
+SELECT 
 	  CASE
 		WHEN MenRut IS NOT NULL AND MenRut <> ''
 		THEN cast(MenRut as int)
@@ -529,7 +529,7 @@ WHERE
 
 Union all
 
-SELECT top 10
+SELECT 
 	  CASE
 		WHEN SolRut IS NOT NULL AND SolRut <> ''
 		THEN CAST(SolRut as int)
@@ -597,6 +597,7 @@ SELECT
 	, NULL as Descripcion 
 	, NULL as Estado
 	, NULL as Folio 
+	, NULL as Telefono
 	, @Interaccion as Interaccion
 	, @Canal as Canal
 FROM [dirtrab_plus].[dbo].[mf_CertificadoAFC] NOLOCK
