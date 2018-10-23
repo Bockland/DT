@@ -23,7 +23,7 @@ select
 	, NULL as Fecha_nacimiento
 	, NULL as Folio
 	, NULL as Telefono
-from [dirtrab_plus].[dbo].[AccidentesLaborales] 
+from [dirtrab_plus].[dbo].[AccidentesLaborales] NOLOCK
 where 
 	ISNUMERIC(RutAcc)=1 
 	and RutAcc<>1
@@ -56,7 +56,7 @@ select
 	 END as Fecha_nacimiento
 	, NULL as Folio
 	, NULL as Telefono
-FROM [dirtrab_plus].[dbo].[df_IngresoSolicitud] 
+FROM [dirtrab_plus].[dbo].[df_IngresoSolicitud] NOLOCK 
 WHERE 
 	SolRut IS NOT NULL 
 	and SolRut<>0 
@@ -88,7 +88,7 @@ SELECT
 	, NULL as Estado
 	, NULL as Comuna 
 	, NULL as Telefono
-FROM [dirtrab_plus].[dbo].[cert_NominaTrab] 
+FROM [dirtrab_plus].[dbo].[cert_NominaTrab] NOLOCK 
 where 
 	TrabRut !=0 
 	and TrabRut<>1 
@@ -117,7 +117,7 @@ SELECT
 	, NULL as Estado
 	, NULL as Comuna 
 	, NULL as Telefono
-FROM [ventanilla].[dbo].[CCL_DatoPrevisional2]
+FROM [ventanilla].[dbo].[CCL_DatoPrevisional2] NOLOCK
 where 
 	RutTrabajador is not null 
 	and ISNUMERIC(RutTrabajador)<>0 
@@ -149,7 +149,7 @@ Select
 	, NULL as Estado
 	, NULL as Comuna 
 	, NULL as Telefono
-FROM [ventanilla].[dbo].[CCL_DetalleDespido]
+FROM [ventanilla].[dbo].[CCL_DetalleDespido] NOLOCK
 where 
 	RutTrab is not null 
 	and ISNUMERIC(RutTrab)<>0 
@@ -176,7 +176,7 @@ select
 	, NULL as Estado
 	, NULL as Comuna 
 	, NULL as Telefono
-FROM [ventanilla].[dbo].[CCL_DetalleLAR]  
+FROM [ventanilla].[dbo].[CCL_DetalleLAR] NOLOCK
 where 
 	RutTrab is not null 
 	and ISNUMERIC(RutTrab)<>0 
@@ -212,7 +212,7 @@ select
 	, NULL as Estado
 	, NULL as Comuna 
 	, NULL as Telefono
-FROM [notarios].[dbo].[TrabNomina]
+FROM [notarios].[dbo].[TrabNomina] NOLOCK
 WHERE 
 	Rut IS NOT NULL AND ISNUMERIC(Rut)<>0 
 	AND Rut<>0 
@@ -244,7 +244,7 @@ SELECT
 	, NULL as Estado
 	, NULL as Comuna 
 	, NULL as Telefono
-FROM [conciliaplus].[dbo].[TRABAJADOR_ASESOR] 
+FROM [conciliaplus].[dbo].[TRABAJADOR_ASESOR] NOLOCK
 WHERE 
 	Rut IS NOT NULL 
 	AND ISNUMERIC(Rut)<>0 
@@ -271,7 +271,7 @@ SELECT
 	, NULL as Estado
 	, NULL as Comuna 
 	, NULL as Telefono
-FROM [dirtrab_plus].[dbo].[df_OtroAfectado] 
+FROM [dirtrab_plus].[dbo].[df_OtroAfectado] NOLOCK
 WHERE 
 	Rut IS NOT NULL 
 	AND Rut !=0 
@@ -306,7 +306,7 @@ select
 	, NULL as Estado
 	, NULL as Comuna 
 	, NULL as Telefono
-FROM [dirtrab_plus].[dbo].[rec_Reclamante]
+FROM [dirtrab_plus].[dbo].[rec_Reclamante] NOLOCK
 WHERE 
 	Rut IS NOT NULL 
 	AND ISNUMERIC(Rut)<>0 
@@ -340,7 +340,7 @@ select
 	, NULL as Estado
 	, CAST(DIR_ID_COMUNA as varchar(50)) as Comuna
 	, NULL as Telefono
-FROM [conciliaplus].[dbo].[DATOS_ASISTENTES_TRABAJADOR]
+FROM [conciliaplus].[dbo].[DATOS_ASISTENTES_TRABAJADOR] NOLOCK
 WHERE 
 	Rut IS NOT NULL 
 	AND ISNUMERIC(Rut)<>0 
@@ -372,7 +372,7 @@ select
 	, cast(EstadoCotizaciones as varchar(200)) as Estado
 	, CAST(IdComunaTrabajo as varchar(50)) as Comuna
 	, NULL as Telefono
-FROM [ventanilla].[dbo].[Ven_CartaAviso_Trabajador_Itel] 
+FROM [ventanilla].[dbo].[Ven_CartaAviso_Trabajador_Itel] NOLOCK
 WHERE 
 	RutTrab IS NOT NULL 
 	AND ISNUMERIC(RutTrab)<>0 
@@ -404,7 +404,7 @@ select
 	, cast(EstadoCotizaciones as varchar(200)) as Estado
 	, NULL as Comuna
 	, NULL as Telefono
-FROM [ventanilla].[dbo].[ven_CartaAvisoMasivaTrabajador]
+FROM [ventanilla].[dbo].[ven_CartaAvisoMasivaTrabajador] NOLOCK
 where TrabRut is not null 
 	and ISNUMERIC(TrabRut)<>0 
 	and TrabRut<>0 
@@ -436,7 +436,7 @@ select
 	, NULL as Estado
 	, NULL as Comuna
 	, NULL as Telefono
-FROM [ventanilla].[dbo].[Ven_Constancia]
+FROM [ventanilla].[dbo].[Ven_Constancia] NOLOCK
 where 
 	rut_dec is not null 
 	and ISNUMERIC(rut_dec)<>0 
@@ -469,7 +469,7 @@ Select
 	, NULL as Estado
 	, CAST(comuna as varchar(50)) as Comuna
 	, NULL as Telefono
-FROM [ventanilla].[dbo].[Ven_Constancia_Itel]
+FROM [ventanilla].[dbo].[Ven_Constancia_Itel] NOLOCK
 where 
 	RutDec is not null 
 	and ISNUMERIC(RutDec)<>0 
@@ -481,9 +481,9 @@ where
 	and rut >1000
 -------------------------------------------------
 --06 - FISCALIZACION ----------------------------
-Declare @Interaccion as int = 6
-Declare @Canal as int = 1
-SELECT 
+Declare @Interaccion as int = 6;
+Declare @Canal as int = 1;
+SELECT top 10
 	  CASE
 		WHEN MenRut IS NOT NULL AND MenRut <> ''
 		THEN cast(MenRut as int)
@@ -509,10 +509,15 @@ SELECT
 		ISNULL((LTRIM(RTRIM(MenApPaterno))),'') +' '+
 		ISNULL((LTRIM(RTRIM(MenApMaterno))),'')) as varchar(250)) as Nombre		
 	, CAST(MenDomCodComuna as varchar(50)) as Comuna	
-	, MenSexo as Sexo
+	, CASE 
+		WHEN MenSexo IS NULL
+		THEN NULL
+		ELSE cast(MenSexo as char(1))
+	END as Sexo 
 	, NULL as Folio
 	, NULL as Estado
 	, NULL as Descripcion
+	, NULL as Telefono
 	, @Interaccion as Interaccion
 	, @Canal as Canal	
 FROM [dirtrab_plus].[dbo].[fi_NominaMenor] NOLOCK
@@ -524,9 +529,7 @@ WHERE
 
 Union all
 
-Declare @Interaccion as int = 6
-Declare @Canal as int = 1
-SELECT 
+SELECT top 10
 	  CASE
 		WHEN SolRut IS NOT NULL AND SolRut <> ''
 		THEN CAST(SolRut as int)
@@ -551,14 +554,18 @@ SELECT
 		ISNULL((LTRIM(RTRIM(SolNombres))),'') +' '+ 
 		ISNULL(LTRIM(RTRIM(SolPaterno)),'') +' '+	
 		ISNULL(LTRIM(RTRIM(SolMaterno)),'')) as varchar(250)) as Nombre
-	, CAST(ISNULL(SolSexo ,'') as varchar(10)) AS Sexo		
 	, CAST(EmpDireccion as varchar(50)) as Comuna	
+	, CASE 
+		WHEN SolSexo IS NULL
+		THEN NULL
+		ELSE cast(SolSexo as char(1))
+	END as Sexo 	
 	, NULL as Folio 
 	, NULL as Estado
 	, NULL as Descripcion 
+	, NULL as Telefono
 	, @Interaccion as Interaccion
-	, @Canal as Canal
-    
+	, @Canal as Canal    
 from [dirtrab_plus].[dbo].[FI_INGRESO_FISCALIZACION] NOLOCK
 WHERE 
 	SolRut IS NOT NULL 
