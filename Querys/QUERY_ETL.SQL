@@ -366,8 +366,8 @@ select
 	, NULL as Folio	
 	, CASE
 		WHEN ISDATE(fechaIngreso) = 1 
-		THEN NULL
-		ELSE cast(fechaIngreso as date)
+		THEN cast(fechaIngreso as date)
+		ELSE NULL
 	END as Fecha
 	, cast(EstadoCotizaciones as varchar(200)) as Estado
 	, CAST(IdComunaTrabajo as varchar(50)) as Comuna
@@ -398,8 +398,8 @@ select
 	, NULL as Folio	
 	, CASE
 		WHEN ISDATE(FechaReg) = 1 
-		THEN NULL
-		ELSE cast(FechaReg as date)
+		THEN cast(FechaReg as date)
+		ELSE NULL
 	END as Fecha
 	, cast(EstadoCotizaciones as varchar(200)) as Estado
 	, NULL as Comuna
@@ -491,7 +491,7 @@ SELECT
 	  END as RUT
 	, CASE
 		WHEN MenDv IS NOT NULL AND MenDv <> ''
-		THEN cast(MenDv as varchar(10))
+		THEN cast(MenDv as char(1))
 		ELSE NULL
 	  END as DV	
 	, CASE
@@ -507,7 +507,7 @@ SELECT
 	, CAST((
 		ISNULL((LTRIM(RTRIM(MenNombres))),'') +' '+
 		ISNULL((LTRIM(RTRIM(MenApPaterno))),'') +' '+
-		ISNULL((LTRIM(RTRIM(MenApMaterno))),'')) as varchar(250)) as Nombre		
+		ISNULL((LTRIM(RTRIM(MenApMaterno))),'')) as varchar(300)) as Nombre		
 	, CAST(MenDomCodComuna as varchar(50)) as Comuna	
 	, CASE 
 		WHEN MenSexo IS NULL
@@ -537,7 +537,7 @@ SELECT
 	  END as RUT
 	, CASE
 		WHEN SolDv IS NOT NULL AND SolDv <> ''
-		THEN CAST(SolDv as varchar(10))
+		THEN CAST(SolDv as char(1))
 		ELSE NULL
 	  END as DV
 	, CASE
@@ -553,7 +553,7 @@ SELECT
 	, CAST((
 		ISNULL((LTRIM(RTRIM(SolNombres))),'') +' '+ 
 		ISNULL(LTRIM(RTRIM(SolPaterno)),'') +' '+	
-		ISNULL(LTRIM(RTRIM(SolMaterno)),'')) as varchar(250)) as Nombre
+		ISNULL(LTRIM(RTRIM(SolMaterno)),'')) as varchar(300)) as Nombre
 	, CAST(EmpDireccion as varchar(50)) as Comuna	
 	, CASE 
 		WHEN SolSexo IS NULL
@@ -574,8 +574,8 @@ WHERE
 	AND SolRut <> 1
 -------------------------------------------------
 --07 - MINISTRO DE FE (AFC) ---------------------
-Declare @Interaccion as int = 7
-Declare @Canal as int = NULL
+Declare @Interaccion as int = 7;
+Declare @Canal as int = NULL;
 SELECT 
 	  CASE
 		WHEN TrabRut IS NOT NULL AND TrabRut <> ''
@@ -587,12 +587,12 @@ SELECT
 		THEN CAST(FechaReg as date)
 		ELSE NULL
 	  END as Fecha
-	, CAST(TrabDv as varchar(10)) as DV
+	, CAST(TrabDv as char(1)) as DV
 	, CAST((
 		ISNULL((LTRIM(RTRIM(TrabNombre))),'') +' '+
 		ISNULL((LTRIM(RTRIM(TrabPaterno))),'') +' '+
-		ISNULL((LTRIM(RTRIM(TrabMaterno))),'')) as varchar(250)) as Nombre
-	, CAST(ISNULL(TrabSexo ,'') as varchar(10)) AS Sexo
+		ISNULL((LTRIM(RTRIM(TrabMaterno))),'')) as varchar(300)) as Nombre
+	, CAST(ISNULL(TrabSexo ,'') as char(1)) AS Sexo
 	, CAST(EmpDireccion as varchar(50)) as Comuna	
 	, NULL as Descripcion 
 	, NULL as Estado
@@ -608,8 +608,8 @@ WHERE
 	AND TrabRut<>1
 -------------------------------------------------
 --08 - MINISTRO DE FE(CONSTANCIA) ---------------
-Declare @Interaccion as int = 8
-Declare @Canal as int = NULL
+Declare @Interaccion as int = 8;
+Declare @Canal as int = NULL;
 SELECT 
 	CASE
 		WHEN TrabRut IS NOT NULL AND TrabRut <> ''
@@ -621,20 +621,20 @@ SELECT
 		THEN CAST(FechaReg as date)
 		ELSE NULL
 	END as Fecha
-	, CAST(TrabDv as varchar(10)) as DV
+	, CAST(TrabDv as char(1)) as DV
 	, CAST((
 		ISNULL((LTRIM(RTRIM(TrabNombre))),'')+' '+
 		ISNULL((LTRIM(RTRIM(TrabPaterno))),'')+' '+
-		ISNULL((LTRIM(RTRIM(TrabMaterno))),'')) as varchar(250)) as Nombre
-	, CAST(ISNULL(TrabSexo ,'') as varchar(10)) AS Sexo
+		ISNULL((LTRIM(RTRIM(TrabMaterno))),'')) as varchar(300)) as Nombre
+	, CAST(ISNULL(TrabSexo ,'') as char(1)) AS Sexo
 	, CAST(Motivo as varchar(2000)) as Descripcion 
 	, CAST(EmpCodComuna as varchar(50)) as Comuna	
 	, NULL as Estado 
 	, NULL as Folio 
 	, NULL as Fecha_nacimiento
+	, NULL as Telefono
 	, @Interaccion as Interaccion
-	, @Canal as Canal
-	
+	, @Canal as Canal	
 FROM [dirtrab_plus].[dbo].[mf_Constancia] NOLOCK
 WHERE 
 	TrabRut IS NOT NULL 
@@ -643,8 +643,8 @@ WHERE
 	AND TrabRut <> 1
 -------------------------------------------------
 --09 - Ministro de Fe (Declaración Jurada) ------
-Declare @Interaccion as int = 9
-Declare @Canal as int = NULL
+Declare @Interaccion as int = 9;
+Declare @Canal as int = NULL;
 SELECT 
 	  CASE
 		WHEN TrabRut IS NOT NULL AND TrabRut <> ''
@@ -656,17 +656,18 @@ SELECT
 		THEN CAST(FechaReg as date)
 		ELSE NULL
 	  END as Fecha
-	, CAST(TrabDv as varchar(10)) as DV
+	, CAST(TrabDv as char(1)) as DV
 	, CAST((
 		ISNULL((LTRIM(RTRIM(TrabNombre))),'') +' '+
 		ISNULL((LTRIM(RTRIM(TrabPaterno))),'') +' '+
-		ISNULL((LTRIM(RTRIM(TrabMaterno))),'')) as varchar(250)) as Nombre
-	, CAST(ISNULL(TrabSexo ,'')as varchar(10)) AS Sexo	
+		ISNULL((LTRIM(RTRIM(TrabMaterno))),'')) as varchar(300)) as Nombre
+	, CAST(ISNULL(TrabSexo ,'')as char(1)) AS Sexo	
 	, CAST(EmpCodComuna as varchar(50)) as Comuna	
 	, CAST(Declaracion as varchar(2000)) as Descripcion	
 	, NULL as Estado
 	, NULL as Folio 
 	, NULL as Fecha_nacimiento
+	, NULL as Telefono
 	, @Interaccion as Interaccion
 	, @Canal as Canal
 	
@@ -678,8 +679,8 @@ WHERE
 	and TrabRut <> 1
 -------------------------------------------------
 --10 - MINISTRO DE FE (FINIQUITO) ---------------
-Declare @Interaccion as int = 10
-Declare @Canal as int = NULL
+Declare @Interaccion as int = 10;
+Declare @Canal as int = NULL;
 SELECT 
 	 CASE
 		WHEN TrabRut IS NOT NULL AND TrabRut <> ''
@@ -691,20 +692,20 @@ SELECT
 		THEN CAST(FechaReg as date)
 		ELSE NULL
 	  END as Fecha
-	, CAST(TrabDv as varchar(10)) as DV
+	, CAST(TrabDv as char(1)) as DV
 	, CAST((
 		isnull((LTRIM(RTRIM(TrabNombre))),'') +' '+
 		isnull((LTRIM(RTRIM(TrabPaterno))),'') +' '+
-		isnull((LTRIM(RTRIM(TrabMaterno))),'')) as varchar(250)) as Nombre
-	, CAST(case TrabSexo when 'F' then 'F' when 'M' then 'M' end as varchar(10)) as Sexo
+		isnull((LTRIM(RTRIM(TrabMaterno))),'')) as varchar(300)) as Nombre
+	, CAST(case TrabSexo when 'F' then 'F' when 'M' then 'M' end as char(1)) as Sexo
 	, CAST(EmpCodComuna as varchar(50)) as Comuna	
 	, NULL as Fecha_nacimiento
 	, NULL as Descripcion 
 	, NULL as Estado
 	, NULL as Folio 
+	, NULL as Telefono
 	, @Interaccion as Interaccion
-	, @Canal as Canal
-    
+	, @Canal as Canal    
 FROM [dirtrab_plus].[dbo].[mf_finiquito] NOLOCK
 WHERE 
 	TrabRut IS NOT NULL 
@@ -713,8 +714,8 @@ WHERE
 	and TrabRut <> 1
 -------------------------------------------------
 --11 - MINISTRO DE FE (RENUNCIA) ----------------
-Declare @Interaccion as int = 11
-Declare @Canal as int = NULL
+Declare @Interaccion as int = 11;
+Declare @Canal as int = NULL;
 SELECT 
 	CASE
 		WHEN TrabRut IS NOT NULL AND TrabRut <> ''
@@ -726,20 +727,20 @@ SELECT
 		THEN CAST(FechaReg as date)
 		ELSE NULL
 	  END as Fecha
-	, CAST(TrabDv as varchar(10)) as DV
+	, CAST(TrabDv as char(1)) as DV
 	, CAST((
 		ISNULL(LTRIM(RTRIM(TrabNombre)),'') +' '+
 		ISNULL((LTRIM(RTRIM(TrabPaterno))),'') +' '+
-		ISNULL((LTRIM(RTRIM(TrabMaterno))),'')) as varchar(250)) as Nombre
-	, CAST(ISNULL(TrabSexo ,'')as varchar(10)) AS Sexo
+		ISNULL((LTRIM(RTRIM(TrabMaterno))),'')) as varchar(300)) as Nombre
+	, CAST(ISNULL(TrabSexo ,'')as char(1)) AS Sexo
 	, CAST(EmpCodComuna as varchar(50)) as Comuna		
 	, NULL as Descripcion 
 	, NULL as Estado
 	, NULL as Folio
 	, NULL as Fecha_nacimiento
+	, NULL as Telefono
 	, @Interaccion as Interaccion
-	, @Canal as Canal
-	
+	, @Canal as Canal	
 FROM [dirtrab_plus].[dbo].[mf_Renuncia] NOLOCK
 WHERE 
 	TrabRut IS NOT NULL 
@@ -748,8 +749,8 @@ WHERE
 	and TrabRut <> 1
 -------------------------------------------------
 --12 - Ministro de Fe (Término de contrato TCP) -
-Declare @Interaccion as int = 12
-Declare @Canal as int = NULL
+Declare @Interaccion as int = 12;
+Declare @Canal as int = NULL;
 SELECT 
 	  CASE
 		WHEN TrabRut IS NOT NULL AND TrabRut <> ''
@@ -761,17 +762,18 @@ SELECT
 		THEN CAST(FechaReg as date)
 		ELSE NULL
 	  END as Fecha
-	, CAST(TrabDv AS VARCHAR(10)) AS DV
+	, CAST(TrabDv AS char(1)) AS DV
 	, CAST((
 		isnull(LTRIM(RTRIM(TrabNombre)),'')+' '+
 		isnull(LTRIM(RTRIM(TrabPaterno)),'')+' '+
-		isnull(LTRIM(RTRIM(TrabMaterno)),'')) AS VARCHAR(255)) as Nombre
-	, CAST(case TrabSexo when 'F' then 'F' when 'M' then 'M' end as varchar(10)) as Sexo
+		isnull(LTRIM(RTRIM(TrabMaterno)),'')) AS VARCHAR(300)) as Nombre
+	, CAST(case TrabSexo when 'F' then 'F' when 'M' then 'M' end as char(1)) as Sexo
 	, CAST(EmpCodComuna as varchar(50)) as Comuna
 	, NULL as Descripcion 
 	, NULL as Estado
 	, NULL as Fecha_nacimiento
 	, NULL as Folio 
+	, NULL as Telefono
 	, @Interaccion as Interaccion
 	, @Canal as Canal	
 FROM [dirtrab_plus].[dbo].[mf_TerContratoCasa] NOLOCK
@@ -782,8 +784,8 @@ WHERE
 	and TrabRut <> 1
 -------------------------------------------------
 --13 - MINISTRO DE FE (TERMINO DE CONTRATO) -----
-Declare @Interaccion as int = 13
-Declare @Canal as int = NULL
+Declare @Interaccion as int = 13;
+Declare @Canal as int = NULL;
 SELECT 
 	  CASE
 		WHEN TrabRut IS NOT NULL AND TrabRut <> ''
@@ -795,17 +797,18 @@ SELECT
 		THEN CAST(FechaReg as date)
 		ELSE NULL
 	  END as Fecha
-	, CAST(TrabDv AS VARCHAR(10)) AS DV
+	, CAST(TrabDv AS CHAR(1)) AS DV
 	, CAST((
 		ISNULL(LTRIM(RTRIM(TrabNombre)),'')+' '+
 		ISNULL(LTRIM(RTRIM(TrabPaterno)),'')+' '+
-		ISNULL(LTRIM(RTRIM(TrabMaterno)),''))AS VARCHAR(255)) as Nombre
-	, CAST(ISNULL(TrabSexo ,'') AS VARCHAR(10)) AS Sexo 
+		ISNULL(LTRIM(RTRIM(TrabMaterno)),''))AS VARCHAR(300)) as Nombre
+	, CAST(ISNULL(TrabSexo ,'') AS CHAR(1)) AS Sexo 
 	, CAST(EmpCodComuna as varchar(50)) as Comuna	
 	, NULL as Descripcion 
 	, NULL as Estado
 	, NULL as Fecha_nacimiento
 	, NULL as Folio 
+	, NULL as Telefono
 	, @Interaccion as Interaccion
 	, @Canal as Canal	
 FROM [dirtrab_plus].[dbo].[mf_TerminoContrato] NOLOCK
@@ -816,8 +819,8 @@ WHERE
 	AND TrabRut <> 1
 -------------------------------------------------
 --14 - MINISTRO DE FE (CONTRATO DE MENORES) -----
-Declare @Interaccion as int = 14
-Declare @Canal as int = NULL
+Declare @Interaccion as int = 14;
+Declare @Canal as int = NULL;
 SELECT 
 	  CASE
 		WHEN TrabRut IS NOT NULL AND TrabRut <> ''
@@ -829,17 +832,18 @@ SELECT
 		THEN CAST(FechaReg as date)
 		ELSE NULL
 	  END as Fecha
-	, CAST(TrabDv AS VARCHAR(10)) AS DV
+	, CAST(TrabDv AS CHAR(1)) AS DV
 	, CAST((
 		ISNULL(LTRIM(RTRIM(TrabNombre)),'')+' '+
 		ISNULL(LTRIM(RTRIM(TrabPaterno)),'')+' '+
-		ISNULL(LTRIM(RTRIM(TrabMaterno)),''))AS VARCHAR(255)) as Nombre
-	, CAST(ISNULL(TrabSexo ,'')AS VARCHAR(10)) AS Sexo 
+		ISNULL(LTRIM(RTRIM(TrabMaterno)),''))AS VARCHAR(300)) as Nombre
+	, CAST(ISNULL(TrabSexo ,'')AS CHAR(1)) AS Sexo 
 	, CAST(TrabCodComuna as varchar(50)) as Comuna
 	, NULL as Descripcion 
 	, NULL as Estado
 	, NULL as Fecha_nacimiento
 	, NULL as Folio 
+	, NULL as Telefono
 	, @Interaccion as Interaccion
 	, @Canal as Canal	
 FROM [dirtrab_plus].[dbo].[mf_TerminoContratoMenores] NOLOCK
@@ -850,8 +854,8 @@ WHERE
 	AND TrabRut <> 1
 -------------------------------------------------
 --15 - MINISTRO DE FE (TRABAJO PESADO) ----------
-Declare @Interaccion as int = 15
-Declare @Canal as int = 1
+Declare @Interaccion as int = 15;
+Declare @Canal as int = 1;
 SELECT 
 	  CASE
 		WHEN TrabRut IS NOT NULL AND TrabRut <> ''
@@ -863,17 +867,18 @@ SELECT
 		THEN CAST(FechaReg as date)
 		ELSE NULL
 	  END as Fecha
-	, CAST(TrabDv AS VARCHAR(10)) AS DV
+	, CAST(TrabDv AS CHAR(1)) AS DV
 	, CAST((
 		ISNULL(LTRIM(RTRIM(TrabNombre)),'')+' '+
 		ISNULL(LTRIM(RTRIM(TrabPaterno)),'')+' '+
-		ISNULL(LTRIM(RTRIM(TrabMaterno)),''))AS VARCHAR(255)) as Nombre
-	, CAST(ISNULL(TrabSexo ,'') AS VARCHAR(10)) AS Sexo 
+		ISNULL(LTRIM(RTRIM(TrabMaterno)),''))AS VARCHAR(300)) as Nombre
+	, CAST(ISNULL(TrabSexo ,'') AS CHAR(1)) AS Sexo 
 	, CAST(EmpCodComuna as varchar(50)) as Comuna
 	, NULL as Descripcion 
 	, NULL as Estado
 	, NULL as Fecha_nacimiento
 	, NULL as Folio 
+	, NULL as Telefono
 	, @Interaccion as Interaccion
 	, @Canal as Canal	
 FROM [dirtrab_plus].[dbo].[mf_TrabPesado] NOLOCK
@@ -884,8 +889,8 @@ WHERE
 	AND TrabRut <> 1
 -------------------------------------------------
 --16 - TRAMITE EN LÍNEA (TCP) -------------------
-Declare @Interaccion as int = 16
-Declare @Canal as int = 4
+Declare @Interaccion as int = 16;
+Declare @Canal as int = 4;
 SELECT	
 	CASE
 		WHEN RutTrab IS NOT NULL AND RutTrab <> ''
@@ -893,17 +898,18 @@ SELECT
 		ELSE NULL
 	  END as RUT
 	, CASE sexo
-		WHEN 1 THEN CAST('F' as nvarchar(1))
-		WHEN 2 THEN CAST('M' as varchar(1))
+		WHEN 1 THEN CAST('F' as char(1))
+		WHEN 2 THEN CAST('M' as char(1))
 	  END as Sexo
-	, CAST(dvTrab as varchar(10)) as DV
-	, CAST(ISNULL(LTRIM(RTRIM(NombreTrab)),'') as varchar(250)) as Nombre	
+	, CAST(dvTrab as char(1)) as DV
+	, CAST(ISNULL(LTRIM(RTRIM(NombreTrab)),'') as varchar(300)) as Nombre	
 	, CAST(codCom as varchar(50)) as Comuna
 	, CAST(fechaNacimiento as date) as Fecha_nacimiento
 	, NULL as Folio 
 	, NULL as Fecha
 	, NULL as Descripcion 
 	, NULL as Estado
+	, NULL as Telefono
 	, @Interaccion as Interaccion
 	, @Canal as Canal
 FROM [ventanilla].[dbo].[TCP_Trabajador] NOLOCK
@@ -917,8 +923,8 @@ WHERE
 	and rutTrab <> -1
 -------------------------------------------------
 --17 - TRÁMITE EN LÍNEA (INCLUSIÓN) -------------
-Declare @Interaccion as int = 17
-Declare @Canal as int = 4
+Declare @Interaccion as int = 17;
+Declare @Canal as int = 4;
 SELECT 
 	  CASE
 		WHEN RUT IS NOT NULL AND RUT <> ''
@@ -931,23 +937,23 @@ SELECT
 		ELSE NULL
 	  END as Fecha	
 	, CASE sexo
-		WHEN 'H'		 THEN CAST('M' as varchar(1))
-		WHEN 'M'		 THEN CAST('F' as varchar(1))
-		WHEN 'Masculino' THEN CAST('M' as varchar(1))
-		WHEN 'MASCULINO' THEN CAST('M' as varchar(1))
-		WHEN 'Hombre'	 THEN CAST('M' as varchar(1))
-		WHEN 'FENENINO'  THEN CAST('F' as varchar(1))
-		WHEN 'Mujer'	 THEN CAST('F' as varchar(1))		
+		WHEN 'H'		 THEN CAST('M' as char(1))
+		WHEN 'M'		 THEN CAST('F' as char(1))
+		WHEN 'Masculino' THEN CAST('M' as char(1))
+		WHEN 'MASCULINO' THEN CAST('M' as char(1))
+		WHEN 'Hombre'	 THEN CAST('M' as char(1))
+		WHEN 'FENENINO'  THEN CAST('F' as char(1))
+		WHEN 'Mujer'	 THEN CAST('F' as char(1))		
 		WHEN ''			 THEN NULL
 	  END as Sexo
-	, CAST(DV as varchar(10)) as DV
+	, CAST(DV as char(1)) as DV
 	, CAST((
 		ISNULL(LTRIM(RTRIM(Nombre)),'')+' '+
 		ISNULL(LTRIM(RTRIM(Apellido_Paterno)),'')+' '+
-		ISNULL(LTRIM(RTRIM(Apellido_Materno)),'')) as varchar(250)) as Nombre	
+		ISNULL(LTRIM(RTRIM(Apellido_Materno)),'')) as varchar(300)) as Nombre	
 	, CAST(ISNULL(Fecha_Nacimiento,'') as datetime) as Fecha_Nacimiento
 	, CAST(Email as varchar(100)) as Correo
-	, CAST(Celular as varchar(10)) as Telefono 
+	, CAST(Celular as varchar(15)) as Telefono 
 	, CAST(Comuna_Trabajador as varchar(50)) as Comuna
 	, NULL as Folio 	
 	, NULL as Descripcion 
@@ -963,8 +969,8 @@ WHERE
 	AND RUT <> 1
 -------------------------------------------------
 --18 - MINISTRO DE FE (LICENCIA MÉDICA) ---------
-Declare @Interaccion as int = 18
-Declare @Canal as int = NULL
+Declare @Interaccion as int = 18;
+Declare @Canal as int = NULL;
 SELECT 
 	  CASE
 		WHEN DecRut IS NOT NULL AND DecRut <> ''
@@ -976,17 +982,18 @@ SELECT
 		THEN CAST(FechaReg as date)
 		ELSE NULL
 	  END as Fecha	
-	, CAST(DecDv as varchar(10)) as DV
+	, CAST(DecDv as char(1)) as DV
 	, CAST((
 		ISNULL((LTRIM(RTRIM(DecNombre))),'')+' '+
 		ISNULL((LTRIM(RTRIM(DecPaterno))),'')+' '+
-		ISNULL((LTRIM(RTRIM(DecMaterno))),'')) as varchar(250)) as Nombre 
-	, CAST(ISNULL(DecSexo ,'') as varchar(10)) AS Sexo 
+		ISNULL((LTRIM(RTRIM(DecMaterno))),'')) as varchar(300)) as Nombre 
+	, CAST(ISNULL(DecSexo ,'') as char(1)) AS Sexo 
 	, CAST(EmpCodComuna as varchar(50)) as Comuna
 	, CAST(MotivoNeg as varchar(2000)) as Descripcion 
 	, NULL as Estado
 	, NULL as Fecha_nacimiento
 	, NULL as Folio
+	, NULL as Telefono
 	, @Interaccion as Interaccion
 	, @Canal as Canal	
 FROM [dirtrab_plus].[dbo].[mf_LicMedica] NOLOCK
