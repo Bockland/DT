@@ -54,13 +54,18 @@ select
 		THEN CAST(SolFechaNac as date) 
 		ELSE NULL
 	 END as Fecha_nacimiento
-	, NULL as Folio
+	, (select 
+		rtrim(ing.CodOficina) + '/' + rtrim(ing.Agno) + '/' + rtrim(ing.NroComision)
+		from [dirtrab_plus].[dbo].FI_INGRESO_FISCALIZACION (NOLOCK) ing
+		where ing.IDFiscalizacion = iso.IDFiscalizacion)
+		as Folio
 	, NULL as Telefono
-FROM [dirtrab_plus].[dbo].[df_IngresoSolicitud] NOLOCK 
+FROM [dirtrab_plus].[dbo].[df_IngresoSolicitud] (NOLOCK) iso  
 WHERE 
 	SolRut IS NOT NULL 
 	and SolRut<>0 
 	and SolRut<>1
+	and iso.CodTipoTermino = 1
 ------------------------------------------------
 --02 - CERTIFICADOS ----------------------------
 DECLARE @INTERACCION AS INT = 2;
@@ -103,8 +108,8 @@ SELECT
 	END as RUT
 	, CASE
 		WHEN ISDATE(periodoMesAno) = 1 
-		THEN NULL
-		ELSE cast(CONCAT(@DIA, '-', RIGHT(periodoMesAno,2), '-', SUBSTRING(periodoMesAno,1,4)) as date)
+		THEN cast(CONCAT(@DIA, '-', RIGHT(periodoMesAno,2), '-', SUBSTRING(periodoMesAno,1,4)) as date)
+		ELSE NULL
 	END as Fecha
 	, cast(DVTrabajador as char(1)) as DV
 	, CAST(LTRIM(RTRIM(NombreTrabajador)) as varchar(300)) as Nombre 
@@ -129,54 +134,63 @@ union all
 
 SELECT 
 	CASE 
-		WHEN ISNUMERIC(ruttrab) = 1
-		THEN CAST(ruttrab as int)
+		WHEN ISNUMERIC(ddes.ruttrab) = 1
+		THEN CAST(ddes.ruttrab as int)
 		ELSE NULL
 	END as RUT
-	, CASE 
-		WHEN (LEN(MesDespido) BETWEEN 1 AND 2) AND (LEN(AnoDespido) = 4)
-		THEN cast(CONCAT(@DIA, '-' ,(CASE WHEN MesDespido BETWEEN 0 AND 10 THEN RIGHT('0' + CAST(MesDespido AS VARCHAR(2)), 2)ELSE CAST(MesDespido AS VARCHAR(10))END), '-' , cast(AnoDespido as varchar(10))) as date)
+	, CASE
+		WHEN ISDATE(p4.fecha_paso4) = 1 
+		THEN cast(p4.fecha_paso4 as date)
 		ELSE NULL
 	END as Fecha
-	, cast(DVTrab as char(1)) as DV	
-	, cast((isnull(LTRIM(RTRIM(NombreTrab)),'')+' '+ isnull(LTRIM(RTRIM(ApPaternoTrab)),'')+' '+isnull(LTRIM(RTRIM(ApMaternoTrab)),'')) as Varchar(300)) as Nombre
+	, cast(ddes.DVTrab as char(1)) as DV	
+	, cast((isnull(LTRIM(RTRIM(ddes.NombreTrab)),'')+' '+ isnull(LTRIM(RTRIM(ddes.ApPaternoTrab)),'')+' '+isnull(LTRIM(RTRIM(ddes.ApMaternoTrab)),'')) as Varchar(300)) as Nombre
 	, @INTERACCION as Interaccion
 	, @CANAL as Canal
 	, @DESCRIPCION_3 as Descripcion 
 	, NULL as Sexo
 	, NULL as Fecha_nacimiento
-	, NULL as Folio
+	, CONCAT('2000/', CASE WHEN iso.Ano IS NULL THEN '' ELSE rtrim(iso.Ano) END, '/', CASE WHEN cer.CertificadoId IS NULL THEN '' ELSE rtrim(cer.CertificadoId) END Folio
 	, NULL as Estado
 	, NULL as Comuna 
 	, NULL as Telefono
-FROM [ventanilla].[dbo].[CCL_DetalleDespido] NOLOCK
+FROM [ventanilla].[dbo].[CCL_Solicitud] iso
+INNER JOIN [ventanilla].[dbo].[CCL_Paso2] (NOLOCK) p2 ON ( iso.SolicitudId = p2.SolicitudId )
+INNER JOIN [ventanilla].[dbo].[CCL_Paso4] (NOLOCK) p4 ON ( iso.SolicitudId = p4.SolicitudId )
+INNER JOIN [ventanilla].[dbo].[CCL_Certificado] NOLOCK) cer ON ( cer.Paso2Id = p2.Paso2Id )
+INNER JOIN [ventanilla].[dbo].[CCL_DetalleDespido] (NOLOCK) ddes on (ddes.Paso2Id = p2.Paso2Id)
 where 
-	RutTrab is not null 
-	and ISNUMERIC(RutTrab)<>0 
-	and RutTrab<>0 and NombreTrab !='' 
-	and  RutTrab<>1
+	ddes.RutTrab is not null 
+	and ISNUMERIC(ddes.RutTrab)<>0 
+	and ddes.RutTrab<>0 and ddes.NombreTrab !='' 
+	and ddes.RutTrab<>1
 
 Union all
 
 SELECT 
 	CASE 
-		WHEN ISNUMERIC(RutTrab) = 1
-		THEN CAST(RutTrab as int)
+		WHEN ISNUMERIC(dlar.RutTrab) = 1
+		THEN CAST(dlar.RutTrab as int)
 		ELSE NULL
 	END as RUT
-	, NULL as Fecha
-	, cast(DVTrab as char(1)) as DV	
- 	, cast((isnull(LTRIM(RTRIM(NombreTrab)),'')+' '+isnull(LTRIM(RTRIM(ApPaternoTrab)),'')+' '+isnull(LTRIM(RTRIM(ApMaternoTrab)),'')) as VARCHAR(300)) AS Nombre 
+	, p4.fecha_paso4 as Fecha
+	, cast(dlar.DVTrab as char(1)) as DV	
+ 	, cast((isnull(LTRIM(RTRIM(dlar.NombreTrab)),'')+' '+isnull(LTRIM(RTRIM(dlar.ApPaternoTrab)),'')+' '+isnull(LTRIM(RTRIM(dlar.ApMaternoTrab)),'')) as VARCHAR(300)) AS Nombre 
 	, @INTERACCION as Interaccion
 	, @CANAL as Canal
-	, cast(DetalleMensajeCuadratura as varchar(2000)) as Descripcion 
+	, cast(dlar.DetalleMensajeCuadratura as varchar(2000)) as Descripcion 
 	, NULL as Sexo
 	, NULL as Fecha_nacimiento
-	, NULL as Folio
+	, CONCAT('2000/', CASE WHEN iso.Ano IS NULL THEN '' ELSE rtrim(iso.Ano) END, '/', CASE WHEN cer.CertificadoId IS NULL THEN '' ELSE rtrim(cer.CertificadoId) END) as Folio
 	, NULL as Estado
 	, NULL as Comuna 
 	, NULL as Telefono
-FROM [ventanilla].[dbo].[CCL_DetalleLAR] NOLOCK
+FROM [ventanilla].[dbo].[CCL_Solicitud] (NOLOCK) iso
+INNER JOIN [ventanilla].[dbo].[CCL_Paso2] (NOLOCK) p2 ON ( iso.SolicitudId = p2.SolicitudId )
+INNER JOIN [ventanilla].[dbo].[CCL_Paso3] (NOLOCK) p3 ON ( iso.SolicitudId = p3.SolicitudId )
+INNER JOIN [ventanilla].[dbo].[CCL_Paso4] (NOLOCK) p4 ON ( iso.SolicitudId = p4.SolicitudId )
+INNER JOIN [ventanilla].[dbo].[CCL_Certificado] cer ON ( cer.Paso2Id = p2.Paso2Id )
+INNER JOIN [ventanilla].[dbo].[CCL_DetalleLAR] (NOLOCK) dlar on (dlar.Paso3Id = p3.Paso3Id)
 where 
 	RutTrab is not null 
 	and ISNUMERIC(RutTrab)<>0 
@@ -194,8 +208,8 @@ SELECT
 	END as RUT
 	, CASE
 		WHEN ISDATE(FechaInicio) = 1 
-		THEN NULL
-		ELSE cast(FechaInicio as date)
+		THEN cast(FechaInicio as date)
+		ELSE NULL
 	END as Fecha
 	, cast(Dv as char(1)) as DV	
 	, cast((isnull(LTRIM(RTRIM(Nombre)),'')+' '+isnull(LTRIM(RTRIM(Paterno)),'')+' '+isnull(LTRIM(RTRIM(Materno)),'')) as varchar(300)) as Nombre
@@ -294,14 +308,14 @@ select
 	, cast(Sexo as char(1)) as Sexo 
 	, CASE
 		WHEN ISDATE(FechaNac) = 1 
-		THEN NULL
-		ELSE cast(FechaNac as date)
+		THEN cast(FechaNac as date)
+		ELSE NULL
 	END as Fecha_nacimiento
 	, NULL as Folio 
 	, CASE
 		WHEN ISDATE(FecInicioRL) = 1 
-		THEN NULL
-		ELSE cast(FecInicioRL as date)
+		THEN cast(FecInicioRL as date)
+		ELSE NULL
 	END as Fecha
 	, NULL as Estado
 	, NULL as Comuna 
@@ -332,8 +346,8 @@ select
 	END as Sexo
 	, CASE
 		WHEN ISDATE(FECHA_NACIMIENTO) = 1 
-		THEN NULL
-		ELSE cast(FECHA_NACIMIENTO as date)
+		THEN cast(FECHA_NACIMIENTO as date)
+		ELSE NULL
 	END as Fecha_nacimiento
 	, NULL as Folio 
 	, NULL as Fecha
@@ -424,8 +438,8 @@ select
 	, cast(CONCAT(isnull(LTRIM(RTRIM(nombres_dec)),''), ' ', isnull(LTRIM(RTRIM(ap_paterno_dec)),''), ' ', isnull(LTRIM(RTRIM(ap_materno_dec)),'')) as varchar(300)) as Nombre 
 	, CASE
 		WHEN ISDATE(fecha) = 1 
-		THEN NULL
-		ELSE cast(fecha as date)
+		THEN cast(fecha as date)
+		ELSE NULL
 	END as Fecha
 	, cast(declaracion as varchar(2000)) as Descripcion 
 	, @INTERACCION as Interaccion
@@ -457,8 +471,8 @@ Select
 	, cast(CONCAT(isnull(LTRIM(RTRIM(NombreDec)),''), ' ', isnull(LTRIM(RTRIM(ApPaterno)),''), ' ', isnull(LTRIM(RTRIM(ApMaterno)),'')) as varchar(300)) as Nombre
 	, CASE
 		WHEN ISDATE(fecha) = 1 
-		THEN NULL
-		ELSE cast(fecha as date)
+		THEN cast(fecha as date)
+		ELSE NULL
 	END as Fecha
 	, cast(declaracion as varchar(2000)) as Descripcion  
 	, @INTERACCION as Interaccion
