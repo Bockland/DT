@@ -127,7 +127,7 @@ where
 
 union all
 
-Select 
+SELECT 
 	CASE 
 		WHEN ISNUMERIC(ruttrab) = 1
 		THEN CAST(ruttrab as int)
@@ -158,7 +158,7 @@ where
 
 Union all
 
-select 
+SELECT 
 	CASE 
 		WHEN ISNUMERIC(RutTrab) = 1
 		THEN CAST(RutTrab as int)
@@ -186,7 +186,7 @@ where
 
 Union all
 
-select 
+SELECT 
 	CASE 
 		WHEN ISNUMERIC(Rut) = 1
 		THEN CAST(Rut as int)
@@ -203,9 +203,10 @@ select
 	, @CANAL as Canal
 	, @DESCRIPCION_5 as Descripcion 
 	, CASE 
-		WHEN Sexo IS NULL
-		THEN NULL
-		ELSE cast(Sexo as char(1))
+		WHEN Sexo IS NULL THEN NULL
+		WHEN Sexo = '1' then 'F'
+		WHEN Sexo = '2' then 'M'
+		ELSE NULL
 	END as Sexo 
 	, NULL as Fecha_nacimiento
 	, NULL as Folio 
