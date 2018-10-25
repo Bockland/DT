@@ -327,14 +327,14 @@ select
 	, cast(Sexo as char(1)) as Sexo 
 	, CASE
 		WHEN ISDATE(FechaNac) = 1 
-		THEN NULL
-		ELSE cast(FechaNac as date)
+		THEN cast(FechaNac as date)
+		ELSE NULL
 	END as Fecha_nacimiento
 	, NULL as Folio 
 	, CASE
 		WHEN ISDATE(FecInicioRL) = 1 
-		THEN NULL
-		ELSE cast(FecInicioRL as date)
+		THEN cast(FecInicioRL as date)
+		ELSE NULL
 	END as Fecha
 	, NULL as Estado
 	, NULL as Comuna 
