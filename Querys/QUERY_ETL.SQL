@@ -242,23 +242,30 @@ DECLARE @DESCRIPCION_3 AS VARCHAR(30) = 'Reclamos Reclamante';
 DECLARE @DESCRIPCION_4 AS VARCHAR(30) = 'Datos Asistentes Trabajador';
 SELECT 
 	CASE 
-		WHEN ISNUMERIC(RUT) = 1
-		THEN CAST(RUT as int)
+		WHEN ISNUMERIC(ases.RUT) = 1
+		THEN CAST(ases.RUT as int)
 		ELSE NULL
 	END as RUT
-	, cast(Dv as char(1)) as DV	
-	, cast(CONCAT(isnull(LTRIM(RTRIM(NOMBRE_COMPLETO)),''), ' ', isnull(LTRIM(RTRIM(APELLIDO_PATERNO)),''), ' ', isnull(LTRIM(RTRIM(APELLIDO_MATERNO)),'')) as varchar(300)) as Nombre
+	, cast(ases.Dv as char(1)) as DV	
+	, cast(CONCAT(isnull(LTRIM(RTRIM(ases.NOMBRE_COMPLETO)),''), ' ', isnull(LTRIM(RTRIM(ases.APELLIDO_PATERNO)),''), ' ', isnull(LTRIM(RTRIM(ases.APELLIDO_MATERNO)),'')) as varchar(300)) as Nombre
 	, @INTERACCION as Interaccion
 	, @CANAL_4 as Canal
 	, @DESCRIPCION_1 as Descripcion 
 	, NULL as Sexo
 	, NULL as Fecha_nacimiento
-	, NULL as Folio 
-	, NULL as Fecha
+	, rtrim(rec.CodOficina) + '/' + rtrim(rec.Agno) + '/' + rtrim(rec.NroComision) as Folio 
+	,CASE
+		WHEN rec.FechaReg is not null and ISDATE(rec.FechaReg) = 1
+		then cast(rec.FechaReg as date)
+		else null 
+		end as Fecha
 	, NULL as Estado
 	, NULL as Comuna 
 	, NULL as Telefono
-FROM [conciliaplus].[dbo].[TRABAJADOR_ASESOR] NOLOCK
+    , NULL as Correo
+FROM [conciliaplus].[dbo].[TRABAJADOR_ASESOR] ases 
+inner join [conciliaplus].[dbo].[PROCESO_CONCILIACION] pro on (pro.PROC_ID = ases.PROC_ID)
+ inner join [dirtrab_plus].[dbo].[rec_ingresoreclamo] rec on (pro.idreclamo = rec.idreclamo)
 WHERE 
 	Rut IS NOT NULL 
 	AND ISNUMERIC(Rut)<>0 
@@ -269,28 +276,40 @@ Union all
 
 SELECT 
 	CASE 
-		WHEN ISNUMERIC(Rut) = 1
-		THEN CAST(Rut as int)
+		WHEN ISNUMERIC(otr.Rut) = 1
+		THEN CAST(otr.Rut as int)
 		ELSE NULL
 	END as RUT
-	, cast(Dv as char(1)) as DV	
-	, cast(CONCAT(isnull(LTRIM(RTRIM(Nombres)),''), ' ', isnull(LTRIM(RTRIM(Paterno)),''), ' ' , isnull(LTRIM(RTRIM(Materno)),'')) as varchar(300)) as Nombre	
+	, cast(otr.Dv as char(1)) as DV	
+	, cast(CONCAT(isnull(LTRIM(RTRIM(otr.Nombres)),''), ' ', isnull(LTRIM(RTRIM(otr.Paterno)),''), ' ' , isnull(LTRIM(RTRIM(otr.Materno)),'')) as varchar(300)) as Nombre	
 	, @INTERACCION as Interaccion
 	, @CANAL_1 as Canal
 	, @DESCRIPCION_2 as Descripcion 
-	, cast(Sexo as char(1)) as Sexo 
-	, NULL as Fecha_nacimiento
-	, NULL as Folio 
-	, NULL as Fecha
+	, cast(otr.Sexo as char(1)) as Sexo 
+	, CASE
+	  WHEN ISDATE(iso.SolFechaNac) = 1
+	  THEN CAST(iso.SolFechaNac AS DATE) 
+	  ELSE NULL
+	  END as Fecha_nacimiento
+	, rtrim(ing.CodOficina) + '/' + rtrim(ing.Agno) + '/' + rtrim(ing.NroComision) as Folio 
+	, CASE
+	  WHEN ISDATE(iso.FechaRegistro)=1
+	  THEN CAST(iso.FechaRegistro AS DATE)
+	  ELSE NULL
+	  END as Fecha
 	, NULL as Estado
 	, NULL as Comuna 
 	, NULL as Telefono
-FROM [dirtrab_plus].[dbo].[df_OtroAfectado] NOLOCK
+    , NULL as Correo
+FROM [dirtrab_plus].[dbo].[df_OtroAfectado] otr 
+     inner join  [dirtrab_plus].[dbo].[df_IngresoSolicitud] iso on (iso.IDDerechoFundamental = otr.IDDerechoFundamental)
+	 inner join [dirtrab_plus].[dbo].[FI_INGRESO_FISCALIZACION] ing on (ing.IDFiscalizacion = iso.IDFiscalizacion)
 WHERE 
 	Rut IS NOT NULL 
 	AND Rut !=0 
 	AND Rut !=1 
 	AND Rut !=123
+	AND iso.CodTipoTermino = 1
 
 Union all
 
@@ -308,18 +327,19 @@ select
 	, cast(Sexo as char(1)) as Sexo 
 	, CASE
 		WHEN ISDATE(FechaNac) = 1 
-		THEN cast(FechaNac as date)
-		ELSE NULL
+		THEN NULL
+		ELSE cast(FechaNac as date)
 	END as Fecha_nacimiento
 	, NULL as Folio 
 	, CASE
 		WHEN ISDATE(FecInicioRL) = 1 
-		THEN cast(FecInicioRL as date)
-		ELSE NULL
+		THEN NULL
+		ELSE cast(FecInicioRL as date)
 	END as Fecha
 	, NULL as Estado
 	, NULL as Comuna 
 	, NULL as Telefono
+    , NULL AS Correo
 FROM [dirtrab_plus].[dbo].[rec_Reclamante] NOLOCK
 WHERE 
 	Rut IS NOT NULL 
@@ -330,31 +350,38 @@ Union all
 
 select 
 	CASE 
-		WHEN ISNUMERIC(Rut) = 1
-		THEN CAST(Rut as int)
+		WHEN ISNUMERIC(tra.Rut) = 1
+		THEN CAST(tra.Rut as int)
 		ELSE NULL
 	END as RUT
-	, cast(DV as char(1)) as DV
-	, cast(CONCAT(isnull(LTRIM(RTRIM(NOMBRES)),''), ' ', isnull(LTRIM(RTRIM(APELLIDO_PATERNO)),''), ' ', isnull(LTRIM(RTRIM(APELLIDO_MATERNO)),'')) as varchar(300)) as Nombre
+	, cast(tra.DV as char(1)) as DV
+	, cast(CONCAT(isnull(LTRIM(RTRIM(tra.NOMBRES)),''), ' ', isnull(LTRIM(RTRIM(tra.APELLIDO_PATERNO)),''), ' ', isnull(LTRIM(RTRIM(tra.APELLIDO_MATERNO)),'')) as varchar(300)) as Nombre
 	, @INTERACCION as Interaccion
 	, @CANAL_1 as Canal
 	, @DESCRIPCION_4 as Descripcion 
 	, CASE
-		WHEN SEXO IS NULL
+		WHEN tra.SEXO IS NULL
 		then NULL
-		ELSE cast(case SEXO when '1' then 'M' when '2' then 'F' end as char(1))
+		ELSE cast(case tra.SEXO when '1' then 'M' when '2' then 'F' end as char(1))
 	END as Sexo
 	, CASE
-		WHEN ISDATE(FECHA_NACIMIENTO) = 1 
-		THEN cast(FECHA_NACIMIENTO as date)
+		WHEN ISDATE(tra.FECHA_NACIMIENTO) = 1 
+		THEN cast(tra.FECHA_NACIMIENTO as date)
 		ELSE NULL
-	END as Fecha_nacimiento
-	, NULL as Folio 
-	, NULL as Fecha
+	    END as Fecha_nacimiento
+	, rtrim(rec.CodOficina) + '/' + rtrim(rec.Agno) + '/' + rtrim(rec.NroComision) as Folio 
+	, CASE
+	  WHEN ISDATE(rec.FechaReg)=1
+	  THEN CAST(rec.FechaReg AS DATE)
+	  ELSE NULL
+	  END as Fecha
 	, NULL as Estado
-	, CAST(DIR_ID_COMUNA as varchar(50)) as Comuna
+	, CAST(tra.DIR_ID_COMUNA as varchar(50)) as Comuna
 	, NULL as Telefono
-FROM [conciliaplus].[dbo].[DATOS_ASISTENTES_TRABAJADOR] NOLOCK
+	, NULL as Correo
+FROM [conciliaplus].[dbo].[DATOS_ASISTENTES_TRABAJADOR] tra
+  inner join [conciliaplus].[dbo].[PROCESO_CONCILIACION] pro on (pro.PROC_ID = tra.PROC_ID)
+  inner join [dirtrab_plus].[dbo].[rec_ingresoreclamo] rec on (pro.idreclamo = rec.idreclamo)
 WHERE 
 	Rut IS NOT NULL 
 	AND ISNUMERIC(Rut)<>0 
@@ -903,30 +930,37 @@ WHERE
 	AND TrabRut <> 1
 -------------------------------------------------
 --16 - TRAMITE EN LÍNEA (TCP) -------------------
-Declare @Interaccion as int = 16;
-Declare @Canal as int = 4;
+Declare @Interaccion as int = 16
+Declare @Canal as int = 4
 SELECT	
 	CASE
-		WHEN RutTrab IS NOT NULL AND RutTrab <> ''
-		THEN CAST(RutTrab as int)
+		WHEN tra.RutTrab IS NOT NULL AND tra.RutTrab <> ''
+		THEN CAST(tra.RutTrab as int)
 		ELSE NULL
 	  END as RUT
-	, CASE sexo
-		WHEN 1 THEN CAST('F' as char(1))
-		WHEN 2 THEN CAST('M' as char(1))
+	, CASE tra.sexo
+		WHEN 1 THEN CAST('F' as nvarchar(1))
+		WHEN 2 THEN CAST('M' as varchar(1))
 	  END as Sexo
-	, CAST(dvTrab as char(1)) as DV
-	, CAST(ISNULL(LTRIM(RTRIM(NombreTrab)),'') as varchar(300)) as Nombre	
-	, CAST(codCom as varchar(50)) as Comuna
-	, CAST(fechaNacimiento as date) as Fecha_nacimiento
+	, CAST(tra.dvTrab as varchar(10)) as DV
+	, CAST(ISNULL(LTRIM(RTRIM(tra.NombreTrab)),'') as varchar(250)) as Nombre	
+	, CAST(tra.codCom as varchar(50)) as Comuna
+    , NULL Telefono
+    , NULL Correo 
+	, CAST(tra.fechaNacimiento as date) as Fecha_nacimiento
 	, NULL as Folio 
-	, NULL as Fecha
-	, NULL as Descripcion 
+	, CASE
+		WHEN con.fechaRegistro IS NOT NULL AND ISDATE(con.fechaRegistro) = 1
+		THEN CAST(con.fechaRegistro AS DATE)
+		ELSE NULL
+		END as Fecha
+	, con.motivoTermino as Descripcion 
 	, NULL as Estado
-	, NULL as Telefono
 	, @Interaccion as Interaccion
 	, @Canal as Canal
-FROM [ventanilla].[dbo].[TCP_Trabajador] NOLOCK
+FROM ventanilla.dbo.TCP_Contrato con 
+Inner join [ventanilla].[dbo].[TCP_Trabajador] as tra  on (con.idTrabajador = tra.idTrabajador)
+left join [ventanilla].[dbo].[TCP_Empleador] emp on (emp.Rut = con.rutEmpleador)
 WHERE 
 	RutTrab IS NOT NULL 
 	AND ISNUMERIC(RutTrab) <> 0 
