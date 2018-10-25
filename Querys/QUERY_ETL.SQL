@@ -203,7 +203,6 @@ SELECT
 	, @CANAL as Canal
 	, @DESCRIPCION_5 as Descripcion 
 	, CASE 
-		WHEN Sexo IS NULL THEN NULL
 		WHEN Sexo = '1' then 'F'
 		WHEN Sexo = '2' then 'M'
 		ELSE NULL
