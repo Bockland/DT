@@ -54,18 +54,13 @@ select
 		THEN CAST(SolFechaNac as date) 
 		ELSE NULL
 	 END as Fecha_nacimiento
-	, (select 
-		rtrim(ing.CodOficina) + '/' + rtrim(ing.Agno) + '/' + rtrim(ing.NroComision)
-		from [dirtrab_plus].[dbo].FI_INGRESO_FISCALIZACION (NOLOCK) ing
-		where ing.IDFiscalizacion = iso.IDFiscalizacion)
-		as Folio
+	, NULL as Folio
 	, NULL as Telefono
-FROM [dirtrab_plus].[dbo].[df_IngresoSolicitud] (NOLOCK) iso  
+FROM [dirtrab_plus].[dbo].[df_IngresoSolicitud] (NOLOCK)  
 WHERE 
 	SolRut IS NOT NULL 
 	and SolRut<>0 
 	and SolRut<>1
-	and iso.CodTipoTermino = 1
 ------------------------------------------------
 --02 - CERTIFICADOS ----------------------------
 DECLARE @INTERACCION AS INT = 2;
@@ -150,14 +145,16 @@ SELECT
 	, @DESCRIPCION_3 as Descripcion 
 	, NULL as Sexo
 	, NULL as Fecha_nacimiento
-	, CONCAT('2000/', CASE WHEN iso.Ano IS NULL THEN '' ELSE rtrim(iso.Ano) END, '/', CASE WHEN cer.CertificadoId IS NULL THEN '' ELSE rtrim(cer.CertificadoId) END Folio
+	--, CONCAT('2000/', CASE WHEN iso.Ano IS NULL THEN '' ELSE rtrim(iso.Ano) END, '/', CASE WHEN cer.CertificadoId IS NULL THEN '' ELSE rtrim(cer.CertificadoId) END) as Folio
+	--, CONCAT('2000/', rtrim(iso.Ano), '/', rtrim(cer.CertificadoId)) as Folio
+	, NULL as Folio
 	, NULL as Estado
 	, NULL as Comuna 
 	, NULL as Telefono
 FROM [ventanilla].[dbo].[CCL_Solicitud] iso
 INNER JOIN [ventanilla].[dbo].[CCL_Paso2] (NOLOCK) p2 ON ( iso.SolicitudId = p2.SolicitudId )
 INNER JOIN [ventanilla].[dbo].[CCL_Paso4] (NOLOCK) p4 ON ( iso.SolicitudId = p4.SolicitudId )
-INNER JOIN [ventanilla].[dbo].[CCL_Certificado] NOLOCK) cer ON ( cer.Paso2Id = p2.Paso2Id )
+INNER JOIN [ventanilla].[dbo].[CCL_Certificado] (NOLOCK) cer ON ( cer.Paso2Id = p2.Paso2Id )
 INNER JOIN [ventanilla].[dbo].[CCL_DetalleDespido] (NOLOCK) ddes on (ddes.Paso2Id = p2.Paso2Id)
 where 
 	ddes.RutTrab is not null 
@@ -173,7 +170,11 @@ SELECT
 		THEN CAST(dlar.RutTrab as int)
 		ELSE NULL
 	END as RUT
-	, p4.fecha_paso4 as Fecha
+	, CASE
+		WHEN ISDATE(p4.fecha_paso4) = 1 
+		THEN cast(p4.fecha_paso4 as date)
+		ELSE NULL
+	END as Fecha
 	, cast(dlar.DVTrab as char(1)) as DV	
  	, cast((isnull(LTRIM(RTRIM(dlar.NombreTrab)),'')+' '+isnull(LTRIM(RTRIM(dlar.ApPaternoTrab)),'')+' '+isnull(LTRIM(RTRIM(dlar.ApMaternoTrab)),'')) as VARCHAR(300)) AS Nombre 
 	, @INTERACCION as Interaccion
@@ -181,7 +182,7 @@ SELECT
 	, cast(dlar.DetalleMensajeCuadratura as varchar(2000)) as Descripcion 
 	, NULL as Sexo
 	, NULL as Fecha_nacimiento
-	, CONCAT('2000/', CASE WHEN iso.Ano IS NULL THEN '' ELSE rtrim(iso.Ano) END, '/', CASE WHEN cer.CertificadoId IS NULL THEN '' ELSE rtrim(cer.CertificadoId) END) as Folio
+	, null as Folio
 	, NULL as Estado
 	, NULL as Comuna 
 	, NULL as Telefono
@@ -215,12 +216,13 @@ SELECT
 	, cast((isnull(LTRIM(RTRIM(Nombre)),'')+' '+isnull(LTRIM(RTRIM(Paterno)),'')+' '+isnull(LTRIM(RTRIM(Materno)),'')) as varchar(300)) as Nombre
 	, @INTERACCION as Interaccion
 	, @CANAL as Canal
-	, @DESCRIPCION_5 as Descripcion 
-	, CASE 
-		WHEN Sexo = '1' then 'F'
-		WHEN Sexo = '2' then 'M'
-		ELSE NULL
-	END as Sexo 
+	, @DESCRIPCION_5 as Descripcion 	
+	--, CASE
+	--	WHEN SEXO IS NULL
+	--	then NULL
+	--	ELSE cast(case SEXO when 1 then 'F' when 2 then 'M' end as char(1))
+	--END as Sexo
+	, NULL as Sexo
 	, NULL as Fecha_nacimiento
 	, NULL as Folio 
 	, NULL as Estado
@@ -240,7 +242,7 @@ DECLARE @DESCRIPCION_1 AS VARCHAR(30) = 'Trabajo Asesor';
 DECLARE @DESCRIPCION_2 AS VARCHAR(30) = 'Otro Afectado';
 DECLARE @DESCRIPCION_3 AS VARCHAR(30) = 'Reclamos Reclamante';
 DECLARE @DESCRIPCION_4 AS VARCHAR(30) = 'Datos Asistentes Trabajador';
-SELECT 
+SELECT top 10
 	CASE 
 		WHEN ISNUMERIC(ases.RUT) = 1
 		THEN CAST(ases.RUT as int)
@@ -253,7 +255,8 @@ SELECT
 	, @DESCRIPCION_1 as Descripcion 
 	, NULL as Sexo
 	, NULL as Fecha_nacimiento
-	, rtrim(rec.CodOficina) + '/' + rtrim(rec.Agno) + '/' + rtrim(rec.NroComision) as Folio 
+	--, rtrim(rec.CodOficina) + '/' + rtrim(rec.Agno) + '/' + rtrim(rec.NroComision) as Folio 
+	, NULL as Folio
 	,CASE
 		WHEN rec.FechaReg is not null and ISDATE(rec.FechaReg) = 1
 		then cast(rec.FechaReg as date)
@@ -265,7 +268,7 @@ SELECT
     , NULL as Correo
 FROM [conciliaplus].[dbo].[TRABAJADOR_ASESOR] ases 
 inner join [conciliaplus].[dbo].[PROCESO_CONCILIACION] pro on (pro.PROC_ID = ases.PROC_ID)
- inner join [dirtrab_plus].[dbo].[rec_ingresoreclamo] rec on (pro.idreclamo = rec.idreclamo)
+inner join [dirtrab_plus].[dbo].[rec_ingresoreclamo] rec on (pro.idreclamo = rec.idreclamo)
 WHERE 
 	Rut IS NOT NULL 
 	AND ISNUMERIC(Rut)<>0 
@@ -274,7 +277,7 @@ WHERE
 
 Union all
 
-SELECT 
+SELECT top 10
 	CASE 
 		WHEN ISNUMERIC(otr.Rut) = 1
 		THEN CAST(otr.Rut as int)
@@ -287,15 +290,16 @@ SELECT
 	, @DESCRIPCION_2 as Descripcion 
 	, cast(otr.Sexo as char(1)) as Sexo 
 	, CASE
-	  WHEN ISDATE(iso.SolFechaNac) = 1
-	  THEN CAST(iso.SolFechaNac AS DATE) 
-	  ELSE NULL
+		WHEN iso.SolFechaNac is not null and ISDATE(iso.SolFechaNac) = 1
+		THEN CAST(iso.SolFechaNac AS DATE) 
+		ELSE NULL
 	  END as Fecha_nacimiento
-	, rtrim(ing.CodOficina) + '/' + rtrim(ing.Agno) + '/' + rtrim(ing.NroComision) as Folio 
+	--, rtrim(ing.CodOficina) + '/' + rtrim(ing.Agno) + '/' + rtrim(ing.NroComision) as Folio 
+	, NULL as Folio
 	, CASE
-	  WHEN ISDATE(iso.FechaRegistro)=1
-	  THEN CAST(iso.FechaRegistro AS DATE)
-	  ELSE NULL
+		WHEN iso.FechaRegistro is not null and ISDATE(iso.FechaRegistro) = 1
+		THEN CAST(iso.FechaRegistro AS DATE)
+		ELSE NULL
 	  END as Fecha
 	, NULL as Estado
 	, NULL as Comuna 
@@ -313,7 +317,7 @@ WHERE
 
 Union all
 
-select 
+select top 10
 	CASE 
 		WHEN ISNUMERIC(Rut) = 1
 		THEN CAST(Rut as int)
@@ -326,13 +330,13 @@ select
 	, @DESCRIPCION_3 as Descripcion 
 	, cast(Sexo as char(1)) as Sexo 
 	, CASE
-		WHEN ISDATE(FechaNac) = 1 
+		WHEN FechaNac is not null and ISDATE(FechaNac) = 1
 		THEN cast(FechaNac as date)
 		ELSE NULL
 	END as Fecha_nacimiento
 	, NULL as Folio 
 	, CASE
-		WHEN ISDATE(FecInicioRL) = 1 
+		WHEN FecInicioRL is not null and ISDATE(FecInicioRL) = 1
 		THEN cast(FecInicioRL as date)
 		ELSE NULL
 	END as Fecha
@@ -348,7 +352,7 @@ WHERE
 
 Union all
 
-select 
+select top 10
 	CASE 
 		WHEN ISNUMERIC(tra.Rut) = 1
 		THEN CAST(tra.Rut as int)
@@ -365,15 +369,16 @@ select
 		ELSE cast(case tra.SEXO when '1' then 'M' when '2' then 'F' end as char(1))
 	END as Sexo
 	, CASE
-		WHEN ISDATE(tra.FECHA_NACIMIENTO) = 1 
+		WHEN tra.FECHA_NACIMIENTO is not null and ISDATE(tra.FECHA_NACIMIENTO) = 1
 		THEN cast(tra.FECHA_NACIMIENTO as date)
 		ELSE NULL
 	    END as Fecha_nacimiento
-	, rtrim(rec.CodOficina) + '/' + rtrim(rec.Agno) + '/' + rtrim(rec.NroComision) as Folio 
+	--, rtrim(rec.CodOficina) + '/' + rtrim(rec.Agno) + '/' + rtrim(rec.NroComision) as Folio 
+	, NULL as Folio
 	, CASE
-	  WHEN ISDATE(rec.FechaReg)=1
-	  THEN CAST(rec.FechaReg AS DATE)
-	  ELSE NULL
+		WHEN rec.FechaReg is not null and ISDATE(rec.FechaReg) = 1
+		  THEN CAST(rec.FechaReg AS DATE)
+		  ELSE NULL
 	  END as Fecha
 	, NULL as Estado
 	, CAST(tra.DIR_ID_COMUNA as varchar(50)) as Comuna
