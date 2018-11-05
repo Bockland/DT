@@ -255,8 +255,7 @@ SELECT top 10
 	, @DESCRIPCION_1 as Descripcion 
 	, NULL as Sexo
 	, NULL as Fecha_nacimiento
-	--, rtrim(rec.CodOficina) + '/' + rtrim(rec.Agno) + '/' + rtrim(rec.NroComision) as Folio 
-	, NULL as Folio
+	, CAST(CONCAT(rtrim(rec.CodOficina), '/', rtrim(rec.Agno), '/', rtrim(rec.NroComision)) as varchar(50)) as Folio
 	,CASE
 		WHEN rec.FechaReg is not null and ISDATE(rec.FechaReg) = 1
 		then cast(rec.FechaReg as date)
@@ -294,8 +293,7 @@ SELECT top 10
 		THEN CAST(iso.SolFechaNac AS DATE) 
 		ELSE NULL
 	  END as Fecha_nacimiento
-	--, rtrim(ing.CodOficina) + '/' + rtrim(ing.Agno) + '/' + rtrim(ing.NroComision) as Folio 
-	, NULL as Folio
+	, CAST(CONCAT(rtrim(ing.CodOficina), '/', rtrim(ing.Agno), '/', rtrim(ing.NroComision)) as varchar(50)) as Folio
 	, CASE
 		WHEN iso.FechaRegistro is not null and ISDATE(iso.FechaRegistro) = 1
 		THEN CAST(iso.FechaRegistro AS DATE)
@@ -373,8 +371,7 @@ select top 10
 		THEN cast(tra.FECHA_NACIMIENTO as date)
 		ELSE NULL
 	    END as Fecha_nacimiento
-	--, rtrim(rec.CodOficina) + '/' + rtrim(rec.Agno) + '/' + rtrim(rec.NroComision) as Folio 
-	, NULL as Folio
+	, CAST(CONCAT(rtrim(rec.CodOficina), '/', rtrim(rec.Agno), '/', rtrim(rec.NroComision)) as varchar(50)) as Folio
 	, CASE
 		WHEN rec.FechaReg is not null and ISDATE(rec.FechaReg) = 1
 		  THEN CAST(rec.FechaReg AS DATE)
@@ -460,7 +457,7 @@ where TrabRut is not null
 --05 - CONSTANCIA -------------------------------
 DECLARE @INTERACCION AS INT = 5;
 DECLARE @CANAL AS INT = 4;
-select 
+select top 10
 	CASE 
 		WHEN ISNUMERIC(rut_dec) = 1
 		THEN CAST(rut_dec as int)
@@ -493,7 +490,7 @@ where
 
 Union all
 
-Select 
+Select top 10
 	CASE 
 		WHEN ISNUMERIC(RUT) = 1
 		THEN CAST(RUT as int)
@@ -511,7 +508,7 @@ Select
 	, NULL as Canal
 	, NULL as Sexo
 	, NULL as Fecha_nacimiento
-	, NULL as Folio 
+	, CAST(CONCAT(right(replicate(' ',4) + CodOficina,4), '/', right(replicate(' ',4) + Agno,4), '/', CONVERT(VARCHAR, Corre)) as varchar(50)) as Folio
 	, NULL as Estado
 	, CAST(comuna as varchar(50)) as Comuna
 	, NULL as Telefono
@@ -529,7 +526,7 @@ where
 --06 - FISCALIZACION ----------------------------
 Declare @Interaccion as int = 6;
 Declare @Canal as int = 1;
-SELECT 
+SELECT top 10
 	  CASE
 		WHEN MenRut IS NOT NULL AND MenRut <> ''
 		THEN cast(MenRut as int)
@@ -575,7 +572,7 @@ WHERE
 
 Union all
 
-SELECT 
+SELECT top 10
 	  CASE
 		WHEN SolRut IS NOT NULL AND SolRut <> ''
 		THEN CAST(SolRut as int)
@@ -605,8 +602,8 @@ SELECT
 		WHEN SolSexo IS NULL
 		THEN NULL
 		ELSE cast(SolSexo as char(1))
-	END as Sexo 	
-	, NULL as Folio 
+	END as Sexo 
+	, CAST(CONCAT(right(replicate(' ',4) + CodOficina,4), '/', right(replicate(' ',4) + Agno,4), '/', CONVERT(VARCHAR, NroComision)) as varchar(50)) as Folio
 	, NULL as Estado
 	, NULL as Descripcion 
 	, NULL as Telefono
@@ -622,7 +619,7 @@ WHERE
 --07 - MINISTRO DE FE (AFC) ---------------------
 Declare @Interaccion as int = 7;
 Declare @Canal as int = NULL;
-SELECT 
+SELECT top 10
 	  CASE
 		WHEN TrabRut IS NOT NULL AND TrabRut <> ''
 		THEN CAST(TrabRut as int)
@@ -642,7 +639,7 @@ SELECT
 	, CAST(EmpDireccion as varchar(50)) as Comuna	
 	, NULL as Descripcion 
 	, NULL as Estado
-	, NULL as Folio 
+	, CAST(CONCAT(right(replicate(' ',4) + CodOficina,4), '/', right(replicate(' ',4) + Agno,4), '/', CONVERT(VARCHAR, NroActuacion)) as varchar(50)) as Folio
 	, NULL as Telefono
 	, @Interaccion as Interaccion
 	, @Canal as Canal
@@ -656,7 +653,7 @@ WHERE
 --08 - MINISTRO DE FE(CONSTANCIA) ---------------
 Declare @Interaccion as int = 8;
 Declare @Canal as int = NULL;
-SELECT 
+SELECT top 10
 	CASE
 		WHEN TrabRut IS NOT NULL AND TrabRut <> ''
 		THEN CAST(TrabRut as int)
@@ -676,7 +673,7 @@ SELECT
 	, CAST(Motivo as varchar(2000)) as Descripcion 
 	, CAST(EmpCodComuna as varchar(50)) as Comuna	
 	, NULL as Estado 
-	, NULL as Folio 
+	, CAST(CONCAT(right(replicate(' ',4) + CodOficina,4), '/', right(replicate(' ',4) + Agno,4), '/', CONVERT(VARCHAR, NroActuacion)) as varchar(50)) as Folio
 	, NULL as Fecha_nacimiento
 	, NULL as Telefono
 	, @Interaccion as Interaccion
@@ -691,7 +688,7 @@ WHERE
 --09 - Ministro de Fe (Declaración Jurada) ------
 Declare @Interaccion as int = 9;
 Declare @Canal as int = NULL;
-SELECT 
+SELECT top 10
 	  CASE
 		WHEN TrabRut IS NOT NULL AND TrabRut <> ''
 		THEN CAST(TrabRut as int)
@@ -710,8 +707,8 @@ SELECT
 	, CAST(ISNULL(TrabSexo ,'')as char(1)) AS Sexo	
 	, CAST(EmpCodComuna as varchar(50)) as Comuna	
 	, CAST(Declaracion as varchar(2000)) as Descripcion	
-	, NULL as Estado
-	, NULL as Folio 
+	, NULL as Estado  
+	, CAST(CONCAT(right(replicate(' ',4) + CodOficina,4), '/', right(replicate(' ',4) + Agno,4), '/', CONVERT(VARCHAR, NroActuacion)) as varchar(50)) as Folio
 	, NULL as Fecha_nacimiento
 	, NULL as Telefono
 	, @Interaccion as Interaccion
@@ -727,7 +724,7 @@ WHERE
 --10 - MINISTRO DE FE (FINIQUITO) ---------------
 Declare @Interaccion as int = 10;
 Declare @Canal as int = NULL;
-SELECT 
+SELECT top 10
 	 CASE
 		WHEN TrabRut IS NOT NULL AND TrabRut <> ''
 		THEN CAST(TrabRut as int)
@@ -748,7 +745,7 @@ SELECT
 	, NULL as Fecha_nacimiento
 	, NULL as Descripcion 
 	, NULL as Estado
-	, NULL as Folio 
+	, CAST(CONCAT(right(replicate(' ',4) + CodOficina,4), '/', right(replicate(' ',4) + Agno,4), '/', CONVERT(VARCHAR, NroActuacion)) as varchar(50)) as Folio
 	, NULL as Telefono
 	, @Interaccion as Interaccion
 	, @Canal as Canal    
@@ -762,7 +759,7 @@ WHERE
 --11 - MINISTRO DE FE (RENUNCIA) ----------------
 Declare @Interaccion as int = 11;
 Declare @Canal as int = NULL;
-SELECT 
+SELECT top 10
 	CASE
 		WHEN TrabRut IS NOT NULL AND TrabRut <> ''
 		THEN CAST(TrabRut as int)
@@ -782,7 +779,7 @@ SELECT
 	, CAST(EmpCodComuna as varchar(50)) as Comuna		
 	, NULL as Descripcion 
 	, NULL as Estado
-	, NULL as Folio
+	, CAST(CONCAT(right(replicate(' ',4) + CodOficina,4), '/', right(replicate(' ',4) + Agno,4), '/', CONVERT(VARCHAR, NroActuacion)) as varchar(50)) as Folio
 	, NULL as Fecha_nacimiento
 	, NULL as Telefono
 	, @Interaccion as Interaccion
@@ -797,7 +794,7 @@ WHERE
 --12 - Ministro de Fe (Término de contrato TCP) -
 Declare @Interaccion as int = 12;
 Declare @Canal as int = NULL;
-SELECT 
+SELECT top 10
 	  CASE
 		WHEN TrabRut IS NOT NULL AND TrabRut <> ''
 		THEN CAST(TrabRut as int)
@@ -818,7 +815,7 @@ SELECT
 	, NULL as Descripcion 
 	, NULL as Estado
 	, NULL as Fecha_nacimiento
-	, NULL as Folio 
+	, CAST(CONCAT(right(replicate(' ',4) + CodOficina,4), '/', right(replicate(' ',4) + Agno,4), '/', CONVERT(VARCHAR, NroActuacion)) as varchar(50)) as Folio
 	, NULL as Telefono
 	, @Interaccion as Interaccion
 	, @Canal as Canal	
@@ -832,7 +829,7 @@ WHERE
 --13 - MINISTRO DE FE (TERMINO DE CONTRATO) -----
 Declare @Interaccion as int = 13;
 Declare @Canal as int = NULL;
-SELECT 
+SELECT top 10
 	  CASE
 		WHEN TrabRut IS NOT NULL AND TrabRut <> ''
 		THEN CAST(TrabRut as int)
@@ -853,7 +850,7 @@ SELECT
 	, NULL as Descripcion 
 	, NULL as Estado
 	, NULL as Fecha_nacimiento
-	, NULL as Folio 
+	, CAST(CONCAT(right(replicate(' ',4) + CodOficina,4), '/', right(replicate(' ',4) + Agno,4), '/', CONVERT(VARCHAR, NroActuacion)) as varchar(50)) as Folio
 	, NULL as Telefono
 	, @Interaccion as Interaccion
 	, @Canal as Canal	
@@ -867,7 +864,7 @@ WHERE
 --14 - MINISTRO DE FE (CONTRATO DE MENORES) -----
 Declare @Interaccion as int = 14;
 Declare @Canal as int = NULL;
-SELECT 
+SELECT top 10
 	  CASE
 		WHEN TrabRut IS NOT NULL AND TrabRut <> ''
 		THEN CAST(TrabRut as int)
@@ -888,7 +885,7 @@ SELECT
 	, NULL as Descripcion 
 	, NULL as Estado
 	, NULL as Fecha_nacimiento
-	, NULL as Folio 
+	, CAST(CONCAT(right(replicate(' ',4) + CodOficina,4), '/', right(replicate(' ',4) + Agno,4), '/', CONVERT(VARCHAR, NroActuacion)) as varchar(50)) as Folio 
 	, NULL as Telefono
 	, @Interaccion as Interaccion
 	, @Canal as Canal	
@@ -902,7 +899,7 @@ WHERE
 --15 - MINISTRO DE FE (TRABAJO PESADO) ----------
 Declare @Interaccion as int = 15;
 Declare @Canal as int = 1;
-SELECT 
+SELECT top 10
 	  CASE
 		WHEN TrabRut IS NOT NULL AND TrabRut <> ''
 		THEN CAST(TrabRut as int)
@@ -923,7 +920,7 @@ SELECT
 	, NULL as Descripcion 
 	, NULL as Estado
 	, NULL as Fecha_nacimiento
-	, NULL as Folio 
+	, CAST(CONCAT(right(replicate(' ',4) + CodOficina,4), '/', right(replicate(' ',4) + Agno,4), '/', CONVERT(VARCHAR, NroActuacion)) as varchar(50)) as Folio 
 	, NULL as Telefono
 	, @Interaccion as Interaccion
 	, @Canal as Canal	
@@ -937,7 +934,7 @@ WHERE
 --16 - TRAMITE EN LÍNEA (TCP) -------------------
 Declare @Interaccion as int = 16
 Declare @Canal as int = 4
-SELECT	
+SELECT top 10	
 	CASE
 		WHEN tra.RutTrab IS NOT NULL AND tra.RutTrab <> ''
 		THEN CAST(tra.RutTrab as int)
@@ -953,7 +950,7 @@ SELECT
     , NULL Telefono
     , NULL Correo 
 	, CAST(tra.fechaNacimiento as date) as Fecha_nacimiento
-	, NULL as Folio 
+	, 'N/A' as Folio 
 	, CASE
 		WHEN con.fechaRegistro IS NOT NULL AND ISDATE(con.fechaRegistro) = 1
 		THEN CAST(con.fechaRegistro AS DATE)
