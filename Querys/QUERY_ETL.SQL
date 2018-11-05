@@ -1021,10 +1021,10 @@ WHERE
 	AND Nombre !='' 
 	AND RUT <> 1
 -------------------------------------------------
---18 - MINISTRO DE FE (LICENCIA MÉDICA) ---------
+--18 - MINISTRO DE FE (LICENCIA MÉDICA) -------OK
 Declare @Interaccion as int = 18;
 Declare @Canal as int = NULL;
-SELECT 
+SELECT top 10
 	  CASE
 		WHEN DecRut IS NOT NULL AND DecRut <> ''
 		THEN CAST(DecRut as int)
@@ -1045,7 +1045,10 @@ SELECT
 	, CAST(MotivoNeg as varchar(2000)) as Descripcion 
 	, NULL as Estado
 	, NULL as Fecha_nacimiento
-	, NULL as Folio
+	, CAST((
+		right(replicate(' ',4) + CodOficina,4) + '/' + 
+		right(replicate(' ',4) + Agno,4) +
+		CONVERT(VARCHAR, NroActuacion)) as varchar(200)) as Folio
 	, NULL as Telefono
 	, @Interaccion as Interaccion
 	, @Canal as Canal	
